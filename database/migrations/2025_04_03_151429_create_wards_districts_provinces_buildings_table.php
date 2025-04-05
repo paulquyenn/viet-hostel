@@ -37,7 +37,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('address');
             $table->foreignId('ward_id')->constrained('wards');
-            $table->foreignId('dictrict_id')->constrained('districts');
+            $table->foreignId('district_id')->constrained('districts');
             $table->foreignId('province_id')->constrained('provinces');
             $table->timestamps();
         });

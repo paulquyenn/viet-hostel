@@ -44,6 +44,22 @@ class SideBar extends Component
                     ],
                 ],
             ],
+            [
+                'key' => 'buildings',
+                'name' => 'Tòa nhà',
+                'route' => 'building.index',
+                'icon' => 'bi bi-building',
+                'submenus' => [
+                    [
+                        'name' => 'Danh sách tòa nhà',
+                        'route' => 'building.index',
+                    ],
+                    [
+                        'name' => 'Thêm tòa nhà',
+                        'route' => 'building.create',
+                    ],
+                ],
+            ],
         ];
         return view('components.layouts.side-bar', [
             'menus' => $menus,
