@@ -14,7 +14,7 @@
                                 <label for="name" class="form-label">Tên tòa nhà</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                        id="name" name="name" value="{{ old('name') }}" required>
+                                        id="name" name="name" value="{{ old('name') }}">
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -24,7 +24,7 @@
                             <div class="mb-3">
                                 <label for="province_id" class="form-label">Tỉnh/Thành phố</label>
                                 <select class="form-select @error('province_id') is-invalid @enderror" id="province_id"
-                                    name="province_id" required>
+                                    name="province_id">
                                     <option value="" selected disabled>Chọn Tỉnh/Thành phố</option>
                                     @foreach ($provinces as $province)
                                         <option value="{{ $province->id }}"
@@ -41,7 +41,7 @@
                             <div class="mb-3">
                                 <label for="district_id" class="form-label">Quận/Huyện</label>
                                 <select class="form-select @error('district_id') is-invalid @enderror" id="district_id"
-                                    name="district_id" required disabled>
+                                    name="district_id">
                                     <option value="" selected disabled>Chọn Quận/Huyện</option>
                                 </select>
                                 @error('district_id')
@@ -52,7 +52,7 @@
                             <div class="mb-3">
                                 <label for="ward_id" class="form-label">Phường/Xã</label>
                                 <select class="form-select @error('ward_id') is-invalid @enderror" id="ward_id"
-                                    name="ward_id" required disabled>
+                                    name="ward_id">
                                     <option value="" selected disabled>Chọn Phường/Xã</option>
                                 </select>
                                 @error('ward_id')
@@ -65,8 +65,20 @@
                                 <div class="input-group">
                                     <input type="text" class="form-control @error('address') is-invalid @enderror"
                                         id="address" name="address" value="{{ old('address') }}"
-                                        placeholder="Số nhà, tên đường, thôn/xóm..." required>
+                                        placeholder="Số nhà, tên đường, thôn/xóm...">
                                     @error('address')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="user_name" class="form-label">Người quản lý</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="user_name"
+                                        value="{{ $user->name }}" readonly>
+                                    <input type="hidden" name="user_id" id="user_id" value="{{ $user->id }}">
+                                    @error('user_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>

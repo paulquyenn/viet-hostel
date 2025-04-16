@@ -75,7 +75,18 @@
                                     @enderror
                                 </div>
                             </div>
-
+                            <div class="mb-3">
+                                <label for="user_name" class="form-label">Người quản lý</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="user_name"
+                                        value="{{ $building->user ? $building->user->name : $user->name }}" readonly>
+                                    <input type="hidden" name="user_id" id="user_id"
+                                        value="{{ $building->user ? $building->user->id : $user->id }}">
+                                </div>
+                                @error('user_id')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
                             <div class="d-flex justify-content-between">
                                 <a href="{{ route('building.index') }}" class="btn btn-secondary">
                                     <i class="bi bi-arrow-left"></i> Quay lại

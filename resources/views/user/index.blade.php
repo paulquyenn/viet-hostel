@@ -19,7 +19,7 @@
                                     <th>Tên</th>
                                     <th>Email</th>
                                     <th>Số điện thoại</th>
-                                    <th>Ngày tạo</th>
+                                    <th>Vai trò</th>
                                     <th>Chức năng</th>
                                 </tr>
                             </thead>
@@ -30,7 +30,7 @@
                                         <td>{{ $item->name }}</td>
                                         <td>{{ $item->email }}</td>
                                         <td>{{ $item->phone }}</td>
-                                        <td>{{ $item->created_at->format('d/m/Y') }}</td>
+                                        <td>{{ $item['roles']['0']->name }}</td>
                                         <td>
                                             <a href="{{ route('user.edit', $item) }}" class="btn btn-sm btn-info">
                                                 <i class="bi bi-pencil-fill"></i>
@@ -53,6 +53,11 @@
                                 @endforelse
                             </tbody>
                         </table>
+                        @if ($user->hasPages())
+                            <div class="mt-4">
+                                {{ $user->links() }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

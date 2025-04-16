@@ -4,21 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBuildingRequest;
 use App\Http\Requests\UpdateBuildingRequest;
+use App\Http\Resources\BuildingResource;
+use App\Http\Resources\UserResource;
 use App\Models\Building;
 use App\Models\Province;
 use App\Models\District;
+use App\Models\User;
 use App\Models\Ward;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class BuildingController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $buildings = Building::all();
-        return view('building.index', compact('buildings'));
+        $columns = Schema::getColumnListing('buildings');
+
+        $buildings = QueryBuilder::for(Building::class)
+            ->allowedFilters($columns)
+            ->allowedSorts($columns)
+            ->paginate()
+            ->appends($request->query());
+        return view('building.index', [
+            'buildings' => BuildingResource::collection($buildings),
+        ]);
     }
 
     /**
@@ -29,7 +43,14 @@ class BuildingController extends Controller
         $provinces = Province::all();
         $districts = District::all();
         $wards = Ward::all();
-        return view('building.create', compact('provinces', 'districts', 'wards'));
+        $user = new UserResource(Auth::user());
+        return view('building.create', [
+            'provinces' => $provinces,
+            'districts' => $districts,
+            'wards' => $wards,
+            'user' => $user,
+            'users' => User::all(),
+        ]);
     }
 
     /**
@@ -37,7 +58,10 @@ class BuildingController extends Controller
      */
     public function store(StoreBuildingRequest $request)
     {
-        $data = $request->all();
+        $data = $request->validated();
+        if (!isset($data['user_id'])) {
+            $data['user_id'] = Auth::id();
+        }
 
         Building::create($data);
         return redirect()->route('building.index');
@@ -54,36 +78,39 @@ class BuildingController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Building $building)
     {
-        $building = Building::findOrFail($id);
-        $provinces = Province::orderBy('name')->get();
-        $districts = District::all();
-        $wards = Ward::all();
-
-        return view('building.edit', compact('building', 'provinces', 'districts', 'wards'));
+        $building = new BuildingResource($building);
+        return view('building.edit', [
+            'building' => $building,
+            'provinces' => Province::all(),
+            'districts' => District::all(),
+            'wards' => Ward::all(),
+            'users' => User::all(),
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBuildingRequest $request, string $id)
+    public function update(UpdateBuildingRequest $request, Building $building)
     {
-        $building = Building::findOrFail($id);
         $data = $request->all();
-
         $building->update($data);
+
         return redirect()->route('building.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Building $building)
     {
-        $building = Building::findOrFail($id);
-        $building->delete();
-
-        return redirect()->route('building.index');
+        try {
+            $building->delete();
+            return redirect()->route('building.index');
+        } catch (\Exception $e) {
+            return redirect()->route('building.index');
+        }
     }
 }

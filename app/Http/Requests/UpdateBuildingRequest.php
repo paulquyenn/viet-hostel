@@ -27,6 +27,7 @@ class UpdateBuildingRequest extends FormRequest
             'ward_id' => ['required', 'exists:wards,id'],
             'district_id' => ['required', 'exists:districts,id'],
             'province_id' => ['required', 'exists:provinces,id'],
+            'user_id' => ['required', 'exists:users,id'],
         ];
     }
 }

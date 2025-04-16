@@ -4,18 +4,30 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $user = User::all();
-        return view('user.index', compact('user'));
+        $columns = Schema::getColumnListing('users');
+
+        $user = QueryBuilder::for(User::class)
+            ->allowedFilters($columns)
+            ->allowedSorts($columns)
+            ->paginate()
+            ->appends($request->query());
+
+        return view('user.index', [
+            'user' => UserResource::collection($user),
+        ]);
     }
 
     /**
@@ -55,7 +67,9 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
-        return view('user.edit', compact('user'));
+        return view('user.edit', [
+            'user' => new UserResource($user),
+        ]);
     }
 
     /**
@@ -83,6 +97,11 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);
+
+        if ($user->role == 'admin') {
+            return redirect()->route('user.index');
+        }
+
         $user->delete();
         return redirect()->route('user.index');
     }

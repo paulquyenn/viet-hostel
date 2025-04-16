@@ -24,9 +24,10 @@ class StoreBuildingRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:255'],
-            'ward_id' => ['required', 'exists:wards,id'],
-            'district_id' => ['required', 'exists:districts,id'],
-            'province_id' => ['required', 'exists:provinces,id'],
+            'ward_id' => ['required', 'numeric', 'exists:wards,id'],
+            'district_id' => ['required', 'numeric', 'exists:districts,id'],
+            'province_id' => ['required', 'numeric', 'exists:provinces,id'],
+            'user_id' => ['nullable', 'numeric', 'exists:users,id'],
         ];
     }
 }

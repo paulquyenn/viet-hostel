@@ -9,6 +9,7 @@ class Building extends Model
     protected $fillable = [
         'name',
         'address',
+        'user_id',
         'ward_id',
         'district_id',
         'province_id'
@@ -27,6 +28,11 @@ class Building extends Model
     public function province()
     {
         return $this->belongsTo(Province::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function getFullAddressAttribute()

@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\BuildingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -28,7 +30,10 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/contact', 'contact')->name('contact');
 });
 
+Route::middleware('auth')->group(function () {
+    Route::resource('user', UserController::class)->only('index', 'create', 'edit', 'show');
+    Route::resource('building', BuildingController::class)->only('index', 'create', 'edit', 'show');
+});
+
 require __DIR__ . '/auth.php';
-require __DIR__ . '/admin.php';
-require __DIR__ . '/landlord.php';
-require __DIR__ . '/tenant.php';
+require __DIR__ . '/api.php';
