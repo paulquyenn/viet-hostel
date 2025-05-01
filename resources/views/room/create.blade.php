@@ -8,7 +8,7 @@
                     </div>
 
                     <div class="card-body">
-
+                        <x-room-image :route="route('image.store')" :name="'room_id'" :id="$room_id['id'] ?? null" />
                         <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
@@ -56,9 +56,9 @@
 
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="deposit_amount">Tiền đặt cọc (VNĐ)</label>
-                                        <input type="number" class="form-control" id="deposit_amount"
-                                            name="deposit_amount" value="{{ old('deposit_amount') }}" required>
+                                        <label for="deposit">Tiền đặt cọc (VNĐ)</label>
+                                        <input type="number" class="form-control" id="deposit" name="deposit"
+                                            value="{{ old('deposit') }}" required>
                                     </div>
                                 </div>
                             </div>
@@ -106,41 +106,6 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="images">Hình ảnh phòng</label>
-                                        <div class="input-group">
-                                            <input type="file" class="form-control" id="images" name="images[]"
-                                                multiple accept="image/*">
-                                        </div>
-                                        <small class="form-text text-muted">Có thể chọn nhiều hình ảnh (JPG,
-                                            PNG)</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-12">
-                                    <div id="image-preview-container" class="d-flex flex-wrap gap-2 mt-2">
-                                        <!-- Image previews will be inserted here by JavaScript -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="primary_image">Ảnh chính</label>
-                                        <select class="form-control" id="primary_image" name="primary_image">
-                                            <option value="0">Hình ảnh đầu tiên</option>
-                                        </select>
-                                        <small class="text-muted">Chọn ảnh chính sẽ hiển thị trên danh sách
-                                            phòng</small>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="d-flex justify-content-between">
                                 <a href="{{ route('room.index') }}" class="btn btn-secondary">Hủy</a>
                                 <button type="submit" class="btn btn-primary">Lưu phòng</button>
@@ -152,51 +117,5 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const imageInput = document.getElementById('images');
-            const previewContainer = document.getElementById('image-preview-container');
-            const primaryImageSelect = document.getElementById('primary_image');
 
-            imageInput.addEventListener('change', function() {
-                // Clear previous previews and options
-                previewContainer.innerHTML = '';
-
-                // Create default option for primary image
-                primaryImageSelect.innerHTML = '';
-                primaryImageSelect.options.add(new Option('Hình ảnh đầu tiên', 0));
-
-                // Create previews and options for each file
-                for (let i = 0; i < this.files.length; i++) {
-                    const file = this.files[i];
-
-                    // Create preview element
-                    const previewDiv = document.createElement('div');
-                    previewDiv.className = 'position-relative';
-
-                    const img = document.createElement('img');
-                    img.className = 'img-thumbnail';
-                    img.style.width = '150px';
-                    img.style.height = '150px';
-                    img.style.objectFit = 'cover';
-
-                    // Read the file and set the source
-                    const reader = new FileReader();
-                    reader.onload = (function(image) {
-                        return function(e) {
-                            image.src = e.target.result;
-                        };
-                    })(img);
-                    reader.readAsDataURL(file);
-
-                    // Add elements to preview
-                    previewDiv.appendChild(img);
-                    previewContainer.appendChild(previewDiv);
-
-                    // Add option to select primary image
-                    primaryImageSelect.options.add(new Option(`Hình ảnh ${i+1}`, i));
-                }
-            });
-        });
-    </script>
 </x-admin-layout>

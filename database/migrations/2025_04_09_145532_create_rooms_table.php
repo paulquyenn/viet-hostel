@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->decimal('deposit', 10, 2);
             $table->tinyInteger('status')->default(0);
-            $table->integer('max-person')->default(1);
+            $table->integer('max_person')->default(1);
             $table->text('utilities')->nullable();
             $table->text('description')->nullable();
             $table->foreignId('building_id')->constrained('buildings');

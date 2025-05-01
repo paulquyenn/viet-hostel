@@ -54,25 +54,11 @@ class RoomController extends Controller
      */
     public function store(StoreRoomRequest $request)
     {
-        DB::beginTransaction();
-        try {
-            $room = Room::create($request->validated());
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $path = $image->store('rooms', 'public');
-                    $room->images()->create([
-                        'image_path' => $path,
-                        'is_main' => $request->input('is_main', false),
-                        'display_order' => 0
-                    ]);
-                }
-            }
-            DB::commit();
-            return redirect()->route('room.index');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back();
-        }
+        $data = $request->all();
+
+        Room::create($data);
+
+        return redirect()->route('room.index');
     }
 
     /**
@@ -80,9 +66,9 @@ class RoomController extends Controller
      */
     public function show(string $id)
     {
-        $room = Room::with('building', 'images')->findOrFail($id);
+        $room = Room::with(['building', 'images'])->findOrFail($id);
         return view('room.show', [
-            'room' => $room
+            'room' => new RoomResource($room),
         ]);
     }
 
@@ -111,51 +97,8 @@ class RoomController extends Controller
     {
         $room = Room::findOrFail($id);
         $data = $request->all();
-        DB::beginTransaction();
-        try {
-            $room->update($data);
-            if ($request->has('delete_images')) {
-                $imagesToDelete = $room->images()->whereIn('id', $request->delete_images)->get();
-
-                foreach ($imagesToDelete as $image) {
-                    if (Storage::disk('public')->exists($image->image_path)) {
-                        Storage::disk('public')->delete($image->image_path);
-                    }
-                    $image->delete();
-                }
-            }
-
-            if ($request->has('is_main')) {
-                $room->images()->update(['is_main' => 0]);
-
-                if (is_numeric($request->is_main)) {
-                    $room->images()->where('id', $request->is_main)->update(['is_main' => 1]);
-                }
-            }
-
-            if ($request->hasFile('images')) {
-                $existingCount = $room->images()->count();
-
-                foreach ($request->file('images') as $index => $image) {
-                    $path = $image->store('rooms', 'public');
-                    RoomImage::create([
-                        'room_id' => $room->id,
-                        'image_path' => $path,
-                        'is_main' => 0,
-                        'display_order' => $existingCount + $index,
-                    ]);
-                }
-
-                if ($room->images()->where('is_main', 1)->count() == 0) {
-                    $room->images()->first()->update(['is_main' => 1]);
-                }
-            }
-            DB::commit();
-            return redirect()->route('room.index');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back();
-        }
+        $room->update($data);
+        return redirect()->route('room.index');
     }
 
     /**
@@ -164,16 +107,8 @@ class RoomController extends Controller
     public function destroy(string $id)
     {
         $room = Room::findOrFail($id);
-        try {
-            foreach ($room->images as $image) {
-                if (Storage::disk('public')->exists($image->image_path)) {
-                    Storage::disk('public')->delete($image->image_path);
-                }
-            }
-            $room->delete();
-            return redirect()->route('room.index');
-        } catch (\Exception $e) {
-            return redirect()->back();
-        }
+
+        $room->delete();
+        return redirect()->route('room.index');
     }
 }

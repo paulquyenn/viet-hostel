@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
             'email' => 'admin@gmail.com'
         ], [
             'name' => 'Admin',
-            'password' => bcrypt('password')
+            'password' => bcrypt('12345678')
         ]);
 
         $admin->assignRole('admin');
@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
             'email' => 'landlord@gmail.com'
         ], [
             'name' => 'Landlord',
-            'password' => bcrypt('password')
+            'password' => bcrypt('12345678')
         ]);
 
         $landlord->assignRole('landlord');
@@ -36,7 +36,7 @@ class UserSeeder extends Seeder
             'email' => 'tenant@gmail.com'
         ], [
             'name' => 'Tenant',
-            'password' => bcrypt('password')
+            'password' => bcrypt('12345678')
         ]);
 
         $tenant->assignRole('tenant');

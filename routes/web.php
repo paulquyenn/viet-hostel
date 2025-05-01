@@ -3,6 +3,9 @@
 use App\Http\Controllers\BuildingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImageController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\RoomImageController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -12,7 +15,7 @@ Route::get('/', function () {
         return view('welcome');
     }
     return redirect()->route('dashboard');
-})->middleware(['auth', 'verified']);
+});
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -25,7 +28,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::controller(HomeController::class)->group(function () {
-    Route::get('/motel', 'motel')->name('motel');
+    Route::get('/motel', 'motel')->name('motel')->middleware('auth');
     Route::get('/about', 'about')->name('about');
     Route::get('/contact', 'contact')->name('contact');
 });
@@ -33,6 +36,9 @@ Route::controller(HomeController::class)->group(function () {
 Route::middleware('auth')->group(function () {
     Route::resource('user', UserController::class)->only('index', 'create', 'edit', 'show');
     Route::resource('building', BuildingController::class)->only('index', 'create', 'edit', 'show');
+    Route::resource('room', RoomController::class)->only('index', 'create', 'edit', 'show');
+    Route::resource('image', ImageController::class)->only('index', 'create', 'edit', 'show');
+    Route::resource('room_image', RoomImageController::class)->only('index', 'create', 'edit', 'show');
 });
 
 require __DIR__ . '/auth.php';

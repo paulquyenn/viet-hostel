@@ -1,4 +1,3 @@
-{{-- filepath: resources/views/room/index.blade.php --}}
 <x-admin-layout>
     <div class="container-fluid">
         <div class="row">
@@ -19,7 +18,6 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Ảnh</th>
                                         <th>Tòa nhà</th>
                                         <th>Số phòng</th>
                                         <th>Diện tích</th>
@@ -34,15 +32,6 @@
                                     @forelse($rooms as $room)
                                         <tr>
                                             <td>{{ $room->id }}</td>
-                                            <td>
-                                                @if ($room->primaryImage)
-                                                    <img src="{{ asset('storage/' . $room->primaryImage->image_path) }}"
-                                                        alt="Room {{ $room->room_number }}" class="img-thumbnail"
-                                                        style="max-width: 100px;">
-                                                @else
-                                                    <span class="text-muted">Không có ảnh</span>
-                                                @endif
-                                            </td>
                                             <td>{{ $room->building->name ?? 'N/A' }}</td>
                                             <td>{{ $room->room_number }}</td>
                                             <td>{{ number_format($room->area, 1) }} m²</td>
@@ -50,11 +39,9 @@
                                             <td>{{ number_format($room->deposit) }} đ</td>
                                             <td>
                                                 @if ($room->status == 0)
-                                                    <span class="badge bg-success">Trống</span>
+                                                    <span class="badge bg-success">Còn Trống</span>
                                                 @elseif($room->status == 1)
                                                     <span class="badge bg-primary">Đã thuê</span>
-                                                @else
-                                                    <span class="badge bg-warning">Đang bảo trì</span>
                                                 @endif
                                             </td>
                                             <td>{{ $room->max_person }}</td>

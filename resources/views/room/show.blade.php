@@ -6,10 +6,10 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Chi tiết phòng {{ $room->room_number }}</h5>
                         <div>
-                            <a href="{{ route('rooms.edit', $room) }}" class="btn btn-warning">
+                            <a href="{{ route('room.edit', $room) }}" class="btn btn-warning">
                                 <i class="bi bi-pencil"></i> Sửa
                             </a>
-                            <a href="{{ route('rooms.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('room.index') }}" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left"></i> Quay lại
                             </a>
                         </div>

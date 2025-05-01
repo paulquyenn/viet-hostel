@@ -8,23 +8,9 @@
                     </div>
 
                     <div class="card-body">
-                        @if (session('error'))
-                            <div class="alert alert-danger">
-                                {{ session('error') }}
-                            </div>
-                        @endif
+                        <x-room-image :route="route('image.store')" :name="'room_id'" :id="$room['id']" :imgs="$room['images']" />
 
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul class="mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-
-                        <form action="{{ route('rooms.update', $room) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ route('room.update', $room) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
 
@@ -72,10 +58,9 @@
 
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="deposit_amount">Tiền đặt cọc (VNĐ)</label>
-                                        <input type="number" class="form-control" id="deposit_amount"
-                                            name="deposit_amount"
-                                            value="{{ old('deposit_amount', $room->deposit_amount) }}" required>
+                                        <label for="deposit">Tiền đặt cọc (VNĐ)</label>
+                                        <input type="number" class="form-control" id="deposit" name="deposit"
+                                            value="{{ old('deposit', $room->deposit) }}" required>
                                     </div>
                                 </div>
                             </div>
@@ -85,7 +70,7 @@
                                     <div class="form-group">
                                         <label for="status">Trạng thái</label>
                                         <select class="form-control" id="status" name="status" required>
-                                            @foreach ($statuses as $key => $value)
+                                            @foreach ($status as $key => $value)
                                                 <option value="{{ $key }}"
                                                     {{ old('status', $room->status) == $key ? 'selected' : '' }}>
                                                     {{ $value }}
@@ -123,63 +108,8 @@
                                 </div>
                             </div>
 
-                            <!-- Existing Images -->
-                            <div class="row mb-3">
-                                <div class="col-md-12">
-                                    <label>Hình ảnh hiện tại</label>
-                                    <div class="d-flex flex-wrap gap-3">
-                                        @if ($room->images->count() > 0)
-                                            @foreach ($room->images as $image)
-                                                <div class="position-relative border p-2 rounded">
-                                                    <img src="{{ asset('storage/' . $image->image_path) }}"
-                                                        alt="Room Image" class="img-thumbnail"
-                                                        style="width: 150px; height: 150px; object-fit: cover;">
-                                                    <div class="mt-2">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="radio"
-                                                                name="primary_image" value="{{ $image->id }}"
-                                                                id="primary_{{ $image->id }}"
-                                                                {{ $image->is_primary ? 'checked' : '' }}>
-                                                            <label class="form-check-label"
-                                                                for="primary_{{ $image->id }}">
-                                                                Ảnh chính
-                                                            </label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                name="delete_images[]" value="{{ $image->id }}"
-                                                                id="delete_{{ $image->id }}">
-                                                            <label class="form-check-label"
-                                                                for="delete_{{ $image->id }}">
-                                                                Xóa
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        @else
-                                            <p class="text-muted">Chưa có hình ảnh nào</p>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Upload new images -->
-                            <div class="row mb-3">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="images">Thêm hình ảnh mới</label>
-                                        <input type="file" class="form-control" id="images" name="images[]"
-                                            multiple accept="image/*">
-                                        <small class="form-text text-muted">Có thể chọn nhiều hình ảnh (JPG,
-                                            PNG)</small>
-                                    </div>
-                                    <div id="new-image-preview" class="d-flex flex-wrap gap-2 mt-2"></div>
-                                </div>
-                            </div>
-
                             <div class="d-flex justify-content-between">
-                                <a href="{{ route('rooms.index') }}" class="btn btn-secondary">Hủy</a>
+                                <a href="{{ route('room.index') }}" class="btn btn-secondary">Hủy</a>
                                 <button type="submit" class="btn btn-primary">Cập nhật</button>
                             </div>
                         </form>
@@ -188,46 +118,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const imageInput = document.getElementById('images');
-            const previewContainer = document.getElementById('new-image-preview');
-
-            imageInput.addEventListener('change', function() {
-                // Clear previous previews
-                previewContainer.innerHTML = '';
-
-                // Create previews for each file
-                for (let i = 0; i < this.files.length; i++) {
-                    const file = this.files[i];
-
-                    // Create preview element
-                    const previewDiv = document.createElement('div');
-                    previewDiv.className = 'position-relative border p-2 rounded';
-
-                    const img = document.createElement('img');
-                    img.className = 'img-thumbnail';
-                    img.style.width = '150px';
-                    img.style.height = '150px';
-                    img.style.objectFit = 'cover';
-
-                    // Read the file and set the source
-                    const reader = new FileReader();
-                    reader.onload = (function(image) {
-                        return function(e) {
-                            image.src = e.target.result;
-                        };
-                    })(img);
-                    reader.readAsDataURL(file);
-
-                    // Add image to preview div
-                    previewDiv.appendChild(img);
-
-                    // Add preview to container
-                    previewContainer.appendChild(previewDiv);
-                }
-            });
-        });
-    </script>
 </x-admin-layout>

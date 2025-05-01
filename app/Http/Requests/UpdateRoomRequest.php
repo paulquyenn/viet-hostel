@@ -31,11 +31,6 @@ class UpdateRoomRequest extends FormRequest
             'utilities' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
             'building_id' => ['required', 'exists:buildings,id'],
-            'images' => ['nullable', 'array'],
-            'images.*' => ['image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
-            'is_main' => ['nullable', 'integer'],
-            'delete_images' => ['nullable', 'array'],
-            'delete_images.*' => ['integer', 'exists:room_images,id'],
         ];
     }
 }

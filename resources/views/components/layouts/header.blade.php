@@ -33,9 +33,6 @@
                             <button @click="open = !open" type="button"
                                 class="flex items-center space-x-2 text-sm rounded-full focus:outline-none"
                                 id="user-menu-button">
-                                <img class="h-8 w-8 rounded-full"
-                                    src="{{ auth()->user()->profile_photo_url ?? asset('images/avatar-placeholder.png') }}"
-                                    alt="{{ auth()->user()->name }}">
                                 <span class="text-gray-700">{{ auth()->user()->name }}</span>
                                 <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                     fill="currentColor">

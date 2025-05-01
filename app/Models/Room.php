@@ -12,7 +12,7 @@ class Room extends Model
         'price',
         'deposit',
         'status',
-        'max-person',
+        'max_person',
         'utilities',
         'description',
         'building_id'
@@ -24,11 +24,7 @@ class Room extends Model
     }
     public function images()
     {
-        return $this->hasMany(RoomImage::class);
-    }
-    public function primaryImage()
-    {
-        return $this->hasOne(RoomImage::class)->where('is_main', 1);
+        return $this->belongsToMany(Image::class, 'room_images');
     }
     public function getStatusAttribute($value)
     {

@@ -23,6 +23,8 @@
         <main id="main" class="main py-16">
             {{ $slot }}
         </main>
+
+        <x-layouts.footer />
     </div>
 </body>
 
