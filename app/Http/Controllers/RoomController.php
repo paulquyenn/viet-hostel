@@ -64,9 +64,8 @@ class RoomController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Room $room)
     {
-        $room = Room::with(['building', 'images'])->findOrFail($id);
         return view('room.show', [
             'room' => new RoomResource($room),
         ]);

@@ -4,6 +4,7 @@ use App\Http\Controllers\BuildingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomImageController;
 use App\Http\Controllers\UserController;
@@ -35,6 +36,7 @@ Route::controller(HomeController::class)->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::resource('user', UserController::class)->only('index', 'create', 'edit', 'show');
+    Route::resource('province', ProvinceController::class)->only('index', 'create', 'edit', 'show');
     Route::resource('building', BuildingController::class)->only('index', 'create', 'edit', 'show');
     Route::resource('room', RoomController::class)->only('index', 'create', 'edit', 'show');
     Route::resource('image', ImageController::class)->only('index', 'create', 'edit', 'show');

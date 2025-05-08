@@ -1,11 +1,25 @@
 <?php
 
+use App\Http\Controllers\ProvinceController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BuildingController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\RoomImageController;
+use App\Models\District;
+
+// Districts API endpoint (không yêu cầu xác thực)
+Route::get('/districts', function (Request $request) {
+    if ($request->has('province_id')) {
+        $districts = District::where('province_id', $request->province_id)
+            ->orderBy('name', 'asc')
+            ->get();
+        return response()->json($districts);
+    }
+    return response()->json([]);
+});
 
 Route::get('/admin', function () {
     return redirect()->route('dashboard');
@@ -13,6 +27,7 @@ Route::get('/admin', function () {
 
 Route::middleware('auth')->prefix('api')->group(function () {
     Route::resource('user', UserController::class)->only('store', 'update', 'destroy');
+    Route::resource('province', ProvinceController::class)->only('store', 'update', 'destroy');
     Route::resource('building', BuildingController::class)->only('store', 'update', 'destroy');
     Route::resource('room', RoomController::class)->only('store', 'update', 'destroy');
     Route::resource('image', ImageController::class)->only('store', 'update', 'destroy');

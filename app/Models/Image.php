@@ -8,7 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Image extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+    // protected $guarded = [];
+    protected $fillable = [
+        'path',
+        'name',
+        'size',
+        'type',
+        'isMain'
+    ];
 
     public function room()
     {
