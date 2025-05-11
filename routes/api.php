@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ProvinceController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\UserController;
@@ -27,7 +26,6 @@ Route::get('/admin', function () {
 
 Route::middleware('auth')->prefix('api')->group(function () {
     Route::resource('user', UserController::class)->only('store', 'update', 'destroy');
-    Route::resource('province', ProvinceController::class)->only('store', 'update', 'destroy');
     Route::resource('building', BuildingController::class)->only('store', 'update', 'destroy');
     Route::resource('room', RoomController::class)->only('store', 'update', 'destroy');
     Route::resource('image', ImageController::class)->only('store', 'update', 'destroy');
