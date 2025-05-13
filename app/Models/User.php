@@ -49,4 +49,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Lấy danh sách đánh giá của người dùng
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

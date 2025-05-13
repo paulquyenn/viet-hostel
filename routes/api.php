@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\BuildingController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoomImageController;
 use App\Models\District;
 
@@ -30,4 +31,6 @@ Route::middleware('auth')->prefix('api')->group(function () {
     Route::resource('room', RoomController::class)->only('store', 'update', 'destroy');
     Route::resource('image', ImageController::class)->only('store', 'update', 'destroy');
     Route::resource('room_image', RoomImageController::class)->only('store', 'update', 'destroy');
+    Route::resource('review', ReviewController::class)->only('store', 'update', 'destroy');
+    Route::get('/rooms/{room}/reviews', [ReviewController::class, 'getRoomReviews']);
 });

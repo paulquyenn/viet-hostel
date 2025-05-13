@@ -4,6 +4,7 @@ use App\Http\Controllers\BuildingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomImageController;
 use App\Http\Controllers\UserController;
@@ -29,6 +30,8 @@ Route::middleware('auth')->group(function () {
 
 Route::controller(HomeController::class)->group(function () {
     Route::get('/motel', 'motel')->name('motel')->middleware('auth');
+    Route::get('/motel/{room}', 'motelDetail')->name('motel.detail')->middleware('auth');
+    Route::get('/my-reviews', 'myReviews')->name('my.reviews')->middleware('auth');
     Route::get('/about', 'about')->name('about');
     Route::get('/contact', 'contact')->name('contact');
 });
@@ -39,6 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('room', RoomController::class)->only('index', 'create', 'edit', 'show');
     Route::resource('image', ImageController::class)->only('index', 'create', 'edit', 'show');
     Route::resource('room_image', RoomImageController::class)->only('index', 'create', 'edit', 'show');
+    Route::resource('review', ReviewController::class);
 });
 
 require __DIR__ . '/auth.php';

@@ -36,9 +36,8 @@
                                     <div class="carousel-inner">
                                         @forelse($room->images as $key => $image)
                                             <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
-                                                <img src="{{ asset('storage/' . $image->image_path) }}"
-                                                    class="d-block w-100" alt="Room Image"
-                                                    style="max-height: 500px; object-fit: contain;">
+                                                <img src="{{ asset('storage/' . $image->path) }}" class="d-block w-100"
+                                                    alt="Room Image" style="max-height: 500px; object-fit: contain;">
                                                 @if ($image->is_primary)
                                                     <div class="carousel-caption">
                                                         <span class="badge bg-success">Ảnh chính</span>
@@ -133,7 +132,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div class="row mb-4">
                             <div class="col-md-12">
                                 <h5>Mô tả</h5>
                                 <div class="card">
@@ -141,6 +140,107 @@
                                         {!! nl2br(e($room->description ?? 'Không có mô tả')) !!}
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Phần đánh giá -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5>Đánh giá phòng ({{ $room->reviews->count() }})</h5>
+                                    <a href="{{ route('review.create', ['room_id' => $room->id]) }}"
+                                        class="btn btn-primary">
+                                        <i class="bi bi-star"></i> Thêm đánh giá
+                                    </a>
+                                </div>
+
+                                @if ($room->reviews->count() > 0)
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="me-3">
+                                                    <h4>{{ number_format($room->average_rating, 1) }}</h4>
+                                                    <div>
+                                                        @for ($i = 1; $i <= 5; $i++)
+                                                            @if ($i <= round($room->average_rating))
+                                                                <i class="bi bi-star-fill text-warning"></i>
+                                                            @else
+                                                                <i class="bi bi-star text-secondary"></i>
+                                                            @endif
+                                                        @endfor
+                                                    </div>
+                                                    <small>{{ $room->reviews->count() }} đánh giá</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @foreach ($room->reviews as $review)
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between">
+                                                    <div>
+                                                        <h6>{{ $review->user->name }}</h6>
+                                                        <div>
+                                                            @for ($i = 1; $i <= 5; $i++)
+                                                                @if ($i <= $review->rating)
+                                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                                @else
+                                                                    <i class="bi bi-star text-secondary"></i>
+                                                                @endif
+                                                            @endfor
+                                                        </div>
+                                                        <small
+                                                            class="text-muted">{{ $review->created_at->format('d/m/Y') }}</small>
+                                                    </div>
+
+                                                    @if (auth()->id() === $review->user_id || auth()->user()->hasRole('admin'))
+                                                        <div>
+                                                            <div class="dropdown">
+                                                                <button class="btn btn-sm btn-light dropdown-toggle"
+                                                                    type="button"
+                                                                    id="dropdownMenuButton{{ $review->id }}"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    <i class="bi bi-three-dots-vertical"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu"
+                                                                    aria-labelledby="dropdownMenuButton{{ $review->id }}">
+                                                                    <li>
+                                                                        <a class="dropdown-item"
+                                                                            href="{{ route('review.edit', $review->id) }}">
+                                                                            <i class="bi bi-pencil"></i> Chỉnh sửa
+                                                                        </a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <form
+                                                                            action="{{ route('review.destroy', $review->id) }}"
+                                                                            method="POST">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button type="submit"
+                                                                                class="dropdown-item text-danger"
+                                                                                onclick="return confirm('Bạn có chắc chắn muốn xóa đánh giá này?')">
+                                                                                <i class="bi bi-trash"></i> Xóa
+                                                                            </button>
+                                                                        </form>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+
+                                                <div class="mt-3">
+                                                    {{ $review->comment ?? 'Không có nhận xét' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="alert alert-info">
+                                        Chưa có đánh giá nào cho phòng này. Hãy là người đầu tiên đánh giá!
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

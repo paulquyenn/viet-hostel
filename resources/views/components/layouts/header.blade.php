@@ -57,6 +57,11 @@
                                     Hồ sơ cá nhân
                                 </a>
 
+                                <a href="{{ route('my.reviews') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Đánh giá của tôi
+                                </a>
+
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
@@ -122,11 +127,6 @@
                 @auth
                     <!-- User info for mobile -->
                     <div class="flex items-center w-full">
-                        <div class="flex-shrink-0">
-                            <img class="h-10 w-10 rounded-full"
-                                src="{{ auth()->user()->avatar ?? asset('images/avatar-placeholder.png') }}"
-                                alt="{{ auth()->user()->name }}">
-                        </div>
                         <div class="ml-3 w-full">
                             <div class="text-base font-medium text-gray-800">
                                 {{ auth()->user()->name }}
@@ -140,6 +140,11 @@
                                 <a href="{{ route('profile.edit') }}"
                                     class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
                                     Hồ sơ cá nhân
+                                </a>
+
+                                <a href="{{ route('my.reviews') }}"
+                                    class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+                                    Đánh giá của tôi
                                 </a>
 
                                 <form method="POST" action="{{ route('logout') }}">
@@ -168,6 +173,14 @@
         </div>
     </div>
 </nav>
+
+<style>
+    nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+</style>
 
 <script>
     // Simple toggle for mobile menu

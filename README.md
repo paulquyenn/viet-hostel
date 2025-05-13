@@ -94,7 +94,7 @@ Dự án sử dụng các công nghệ:
 
 -   Laravel (Backend)
 -   Tailwind CSS (Frontend styling)
--   Bootstrap 5.x (Frontend stylinh admin)
+-   Bootstrap 5.x (Frontend styling admin)
 -   Vite (Frontend build tool)
 
 ## Giấy phép

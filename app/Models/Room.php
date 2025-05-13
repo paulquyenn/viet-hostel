@@ -32,4 +32,20 @@ class Room extends Model
     {
         return $value == 0 ? 'Còn trống' : 'Đã thuê';
     }
+
+    /**
+     * Lấy danh sách đánh giá của phòng
+     */
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Lấy điểm đánh giá trung bình
+     */
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->avg('rating') ?? 0;
+    }
 }

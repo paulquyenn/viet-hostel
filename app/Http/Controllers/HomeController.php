@@ -10,6 +10,7 @@ use App\Models\Province;
 use App\Models\Room;
 use App\Models\RoomImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use function Pest\Laravel\get;
 
@@ -23,6 +24,29 @@ class HomeController extends Controller
     public function contact()
     {
         return view('contact');
+    }
+
+    public function motelDetail(Room $room)
+    {
+        // Load room with its relationships
+        $room = $room->load(['building.province', 'building.district', 'building.ward', 'images', 'reviews.user']);
+
+        // Get similar rooms based on criteria
+        $similarRooms = Room::query()
+            ->where('id', '!=', $room->id) // Exclude current room
+            ->where('status', 0) // Only available rooms (status = 0 means available)
+            ->where(function ($query) use ($room) {
+                $query->where('building_id', $room->building_id) // Same building
+                    ->orWhereBetween('price', [$room->price * 0.8, $room->price * 1.2]); // Price range within ±20%
+            })
+            ->with(['building.province', 'building.district', 'building.ward', 'images', 'reviews'])
+            ->limit(3)
+            ->get();
+
+        return view('motel-detail', [
+            'room' => $room,
+            'similarRooms' => $similarRooms,
+        ]);
     }
 
     public function motel(Request $request)
@@ -92,6 +116,15 @@ class HomeController extends Controller
             'buildings' => $buildings,
             'rooms' => $rooms,
             'filters' => $request->all()
+        ]);
+    }
+
+    public function myReviews()
+    {
+        $reviews = Auth::user()->reviews()->with(['room.building'])->latest()->paginate(10);
+
+        return view('tenant.my-reviews', [
+            'reviews' => $reviews
         ]);
     }
 }

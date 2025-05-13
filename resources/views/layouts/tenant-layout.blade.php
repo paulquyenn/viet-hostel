@@ -20,7 +20,7 @@
         <x-layouts.header />
 
         <!-- Page Content -->
-        <main id="main" class="main py-16">
+        <main id="main" class="main pt-16">
             {{ $slot }}
         </main>
 

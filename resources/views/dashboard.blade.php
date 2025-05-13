@@ -13,9 +13,66 @@
 
         <section class="section dashboard">
             <div class="row">
+                <!-- Thống kê -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Quản lý người dùng hệ thống</h5>
+                            <p>Admin có vai trò quản lý người dùng trong hệ thống Trọ Việt</p>
+                        </div>
+                    </div>
+                </div>
 
-                <h1>Trang Admin</h1>
+                <div class="col-md-4">
+                    <div class="card info-card customers-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Tổng số người dùng</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>{{ \App\Models\User::count() }}</h6>
+                                    <span class="text-muted small pt-2">Người dùng đã đăng ký</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="col-md-4">
+                    <div class="card info-card customers-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Chủ trọ</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-warning">
+                                    <i class="bi bi-person-badge text-white"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>{{ \App\Models\User::role('landlord')->count() }}</h6>
+                                    <span class="text-muted small pt-2">Chủ trọ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card info-card customers-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Người thuê</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success">
+                                    <i class="bi bi-person-check text-white"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>{{ \App\Models\User::role('tenant')->count() }}</h6>
+                                    <span class="text-muted small pt-2">Người thuê trọ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -23,6 +80,141 @@
                 class="bi bi-arrow-up-short"></i></a>
 
     </x-admin-layout>
+@endrole
+
+@role('landlord')
+    <x-landlord-layout>
+        <div class="pagetitle">
+            <h1>Trang quản lý</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <section class="section dashboard">
+            <div class="row">
+                <!-- Thống kê của chủ trọ -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Chào mừng đến với Trọ Việt</h5>
+                            <p>Quản lý các nhà trọ, phòng trọ và người thuê của bạn</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="card info-card revenue-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Tòa nhà</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-building"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>{{ \App\Models\Building::where('user_id', auth()->id())->count() }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="card info-card sales-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Phòng trọ</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-door-open"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>{{ \App\Models\Room::whereHas('building', function($q) {
+                                        $q->where('user_id', auth()->id());
+                                    })->count() }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="card info-card customers-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Phòng trống</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-unlock"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>{{ \App\Models\Room::whereHas('building', function($q) {
+                                        $q->where('user_id', auth()->id());
+                                    })->where('status', 0)->count() }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="card info-card revenue-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Phòng đã thuê</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-lock"></i>
+                                </div>
+                                <div class="ps-3">
+                                    <h6>{{ \App\Models\Room::whereHas('building', function($q) {
+                                        $q->where('user_id', auth()->id());
+                                    })->where('status', 1)->count() }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danh sách tòa nhà -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card recent-sales overflow-auto">
+                        <div class="card-body">
+                            <h5 class="card-title">Tòa nhà của bạn <span>| Gần đây</span></h5>
+
+                            <table class="table table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Tên</th>
+                                        <th scope="col">Địa chỉ</th>
+                                        <th scope="col">Phòng</th>
+                                        <th scope="col">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(\App\Models\Building::where('user_id', auth()->id())->latest()->take(5)->get() as $building)
+                                        <tr>
+                                            <td>{{ $building->name }}</td>
+                                            <td>{{ $building->full_address }}</td>
+                                            <td>{{ $building->rooms->count() }}</td>
+                                            <td>
+                                                <a href="{{ route('building.show', $building) }}" class="btn btn-sm btn-primary">Xem</a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+                class="bi bi-arrow-up-short"></i></a>
+    </x-landlord-layout>
 @endrole
 
 @role('tenant')
