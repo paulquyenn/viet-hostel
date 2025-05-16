@@ -261,28 +261,6 @@
                                         <span class="text-lg">VND</span></span>
                                 </div>
                                 <div id="contact" class="mt-4 flex flex-col space-y-2">
-                                    @if (!$room->isRented())
-                                        <a href="{{ route('rental-requests.create', ['room_id' => $room->id]) }}"
-                                            class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition duration-200 font-medium">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                            Đăng ký thuê phòng
-                                        </a>
-                                    @else
-                                        <div
-                                            class="inline-flex items-center justify-center bg-gray-400 text-white py-3 px-4 rounded-lg font-medium cursor-not-allowed">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                            </svg>
-                                            Phòng đã được thuê
-                                        </div>
-                                    @endif
-
                                     <a href="tel:+84123456789"
                                         class="inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg transition duration-200 font-medium">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"

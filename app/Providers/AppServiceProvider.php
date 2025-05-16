@@ -11,8 +11,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Đăng ký ContractServiceProvider
-        $this->app->register(ContractServiceProvider::class);
+        //
     }
 
     /**
