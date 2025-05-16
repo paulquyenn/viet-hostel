@@ -11,6 +11,7 @@ use App\Models\Room;
 use App\Models\RoomImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use function Pest\Laravel\get;
 
@@ -51,11 +52,26 @@ class HomeController extends Controller
 
     public function motel(Request $request)
     {
-        $provinces = Province::orderBy('name', 'asc')->get();
-        $buildings = Building::orderBy('name', 'asc')->get();
-        $districts = District::orderBy('name', 'asc')->get();
+        // Cache danh sách các tỉnh/thành phố, quận/huyện để tránh truy vấn lặp lại
+        $provinces = Cache::remember('provinces', 60 * 24, function () {
+            return Province::orderBy('name', 'asc')->get();
+        });
 
-        $query = Room::query()->with('images', 'building.province', 'building.district', 'building.ward');
+        $buildings = Building::orderBy('name', 'asc')->get();
+
+        // Nếu có province_id, cache danh sách quận/huyện theo tỉnh/thành phố đó
+        if ($request->has('province_id') && !empty($request->province_id)) {
+            $districts = Cache::remember('districts_' . $request->province_id, 60 * 24, function () use ($request) {
+                return District::where('province_id', $request->province_id)->orderBy('name', 'asc')->get();
+            });
+        } else {
+            $districts = Cache::remember('all_districts', 60 * 24, function () {
+                return District::orderBy('name', 'asc')->get();
+            });
+        }
+
+        // Chỉ load những mối quan hệ thực sự cần thiết cho trang danh sách
+        $query = Room::query()->with(['images', 'building', 'contracts']);
 
         if ($request->has('search') && !empty($request->search)) {
             $searchTerm = $request->search;

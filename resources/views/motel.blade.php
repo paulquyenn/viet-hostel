@@ -602,16 +602,40 @@
                     districtSelect.disabled = false;
                     districtSelect.classList.remove('cursor-not-allowed', 'opacity-75');
 
-                    // Fetch districts for the selected province
-                    fetch(`/districts?province_id=${provinceId}`)
-                        .then(response => response.json())
+                    // Hiển thị trạng thái loading
+                    const loadingOption = document.createElement('option');
+                    loadingOption.textContent = 'Đang tải danh sách quận/huyện...';
+                    loadingOption.disabled = true;
+                    districtSelect.appendChild(loadingOption);
+                    districtSelect.value = loadingOption.value;
+
+                    // Fetch districts for the selected province với timeout 3 giây
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+                    fetch(`/api/districts?province_id=${provinceId}`, {
+                            signal: controller.signal
+                        })
+                        .then(response => {
+                            clearTimeout(timeoutId);
+                            if (!response.ok) {
+                                throw new Error('Không thể tải dữ liệu quận/huyện');
+                            }
+                            return response.json();
+                        })
                         .then(districts => {
+                            districtSelect.innerHTML = '<option value="">Chọn Quận/Huyện</option>';
                             districts.forEach(district => {
                                 const option = document.createElement('option');
                                 option.value = district.id;
                                 option.textContent = district.name;
                                 districtSelect.appendChild(option);
                             });
+                        })
+                        .catch(error => {
+                            console.error('Lỗi khi tải danh sách quận/huyện:', error);
+                            districtSelect.innerHTML =
+                                '<option value="">Có lỗi xảy ra, vui lòng thử lại</option>';
                         });
                 } else {
                     // Disable district dropdown if no province is selected
