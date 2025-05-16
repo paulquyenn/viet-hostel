@@ -45,6 +45,18 @@ class SideBar extends Component
                 ],
             ],
             [
+                'key' => 'bookings',
+                'name' => 'Đặt phòng',
+                'route' => 'admin.bookings.index',
+                'icon' => 'bi bi-calendar-check',
+                'submenus' => [
+                    [
+                        'name' => 'Danh sách đặt phòng',
+                        'route' => 'admin.bookings.index',
+                    ],
+                ],
+            ],
+            [
                 'key' => 'buildings',
                 'name' => 'Tòa nhà',
                 'route' => 'building.index',

@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Booking extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'room_id',
+        'desired_move_date',
+        'duration',
+        'note',
+        'status'
+    ];
+
+    protected $casts = [
+        'desired_move_date' => 'date',
+    ];
+
+    /**
+     * Người dùng đã đặt phòng
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Phòng được đặt
+     */
+    public function room()
+    {
+        return $this->belongsTo(Room::class);
+    }
+
+    /**
+     * Hợp đồng liên quan đến đặt phòng
+     */
+    public function contract()
+    {
+        return $this->hasOne(Contract::class);
+    }
+
+    /**
+     * Lấy trạng thái hiển thị cho người dùng
+     */
+    public function getStatusTextAttribute()
+    {
+        return [
+            'pending' => 'Đang chờ xử lý',
+            'approved' => 'Đã duyệt',
+            'rejected' => 'Đã từ chối',
+            'cancelled' => 'Đã hủy',
+        ][$this->status] ?? $this->status;
+    }
+}

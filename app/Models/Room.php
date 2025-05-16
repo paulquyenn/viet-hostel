@@ -48,4 +48,20 @@ class Room extends Model
     {
         return $this->reviews()->avg('rating') ?? 0;
     }
+
+    /**
+     * Lấy danh sách đặt phòng
+     */
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    /**
+     * Lấy danh sách hợp đồng của phòng
+     */
+    public function contracts()
+    {
+        return $this->hasMany(Contract::class);
+    }
 }

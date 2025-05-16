@@ -45,7 +45,8 @@
                         <div class="card-body">
                             <h5 class="card-title">Chủ trọ</h5>
                             <div class="d-flex align-items-center">
-                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-warning">
+                                <div
+                                    class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-warning">
                                     <i class="bi bi-person-badge text-white"></i>
                                 </div>
                                 <div class="ps-3">
@@ -62,7 +63,8 @@
                         <div class="card-body">
                             <h5 class="card-title">Người thuê</h5>
                             <div class="d-flex align-items-center">
-                                <div class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success">
+                                <div
+                                    class="card-icon rounded-circle d-flex align-items-center justify-content-center bg-success">
                                     <i class="bi bi-person-check text-white"></i>
                                 </div>
                                 <div class="ps-3">
@@ -131,9 +133,10 @@
                                     <i class="bi bi-door-open"></i>
                                 </div>
                                 <div class="ps-3">
-                                    <h6>{{ \App\Models\Room::whereHas('building', function($q) {
+                                    <h6>{{ \App\Models\Room::whereHas('building', function ($q) {
                                         $q->where('user_id', auth()->id());
-                                    })->count() }}</h6>
+                                    })->count() }}
+                                    </h6>
                                 </div>
                             </div>
                         </div>
@@ -149,9 +152,10 @@
                                     <i class="bi bi-unlock"></i>
                                 </div>
                                 <div class="ps-3">
-                                    <h6>{{ \App\Models\Room::whereHas('building', function($q) {
+                                    <h6>{{ \App\Models\Room::whereHas('building', function ($q) {
                                         $q->where('user_id', auth()->id());
-                                    })->where('status', 0)->count() }}</h6>
+                                    })->where('status', 0)->count() }}
+                                    </h6>
                                 </div>
                             </div>
                         </div>
@@ -167,9 +171,10 @@
                                     <i class="bi bi-lock"></i>
                                 </div>
                                 <div class="ps-3">
-                                    <h6>{{ \App\Models\Room::whereHas('building', function($q) {
+                                    <h6>{{ \App\Models\Room::whereHas('building', function ($q) {
                                         $q->where('user_id', auth()->id());
-                                    })->where('status', 1)->count() }}</h6>
+                                    })->where('status', 1)->count() }}
+                                    </h6>
                                 </div>
                             </div>
                         </div>
@@ -194,13 +199,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach(\App\Models\Building::where('user_id', auth()->id())->latest()->take(5)->get() as $building)
+                                    @foreach (\App\Models\Building::where('user_id', auth()->id())->latest()->take(5)->get() as $building)
                                         <tr>
                                             <td>{{ $building->name }}</td>
                                             <td>{{ $building->full_address }}</td>
                                             <td>{{ $building->rooms->count() }}</td>
                                             <td>
-                                                <a href="{{ route('building.show', $building) }}" class="btn btn-sm btn-primary">Xem</a>
+                                                <a href="{{ route('building.show', $building) }}"
+                                                    class="btn btn-sm btn-primary">Xem</a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -227,7 +233,8 @@
                         <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
                             <span class="block text-gray-900">Chào mừng đến với Trọ Việt</span>
                         </h1>
-                        <p class="mt-3 max-w-md mx-auto text-base text-gray-900 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                        <p
+                            class="mt-3 max-w-md mx-auto text-base text-gray-900 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
                             Nền tảng quản lý nhà trọ hiện đại, giúp bạn dễ dàng theo dõi hợp đồng, thanh toán và thông tin
                             liên lạc.
                         </p>

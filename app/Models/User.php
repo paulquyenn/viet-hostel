@@ -57,4 +57,28 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+
+    /**
+     * Lấy danh sách đặt phòng của người dùng
+     */
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    /**
+     * Lấy danh sách hợp đồng thuê phòng của người dùng (với vai trò là người thuê)
+     */
+    public function contracts()
+    {
+        return $this->hasMany(Contract::class, 'tenant_id');
+    }
+
+    /**
+     * Lấy danh sách hợp đồng của chủ trọ
+     */
+    public function landlordContracts()
+    {
+        return $this->hasMany(Contract::class, 'landlord_id');
+    }
 }

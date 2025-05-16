@@ -57,6 +57,16 @@
                                     Hồ sơ cá nhân
                                 </a>
 
+                                <a href="{{ route('tenant.contracts.index') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Hợp đồng của tôi
+                                </a>
+
+                                <a href="{{ route('tenant.bookings.index') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Đặt phòng của tôi
+                                </a>
+
                                 <a href="{{ route('my.reviews') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                     Đánh giá của tôi
