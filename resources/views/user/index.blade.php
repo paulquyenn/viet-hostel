@@ -30,7 +30,8 @@
                                         <td>{{ $item->name }}</td>
                                         <td>{{ $item->email }}</td>
                                         <td>{{ $item->phone }}</td>
-                                        <td>{{ $item['roles']['0']->name }}</td>
+                                        <td>{{ $item['roles']->count() > 0 ? $item['roles'][0]->name : 'Không có vai trò' }}
+                                        </td>
                                         <td>
                                             <a href="{{ route('user.edit', $item) }}" class="btn btn-sm btn-info">
                                                 <i class="bi bi-pencil-fill"></i>
