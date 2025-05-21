@@ -45,18 +45,6 @@ class SideBar extends Component
                 ],
             ],
             [
-                'key' => 'bookings',
-                'name' => 'Đặt phòng',
-                'route' => 'admin.bookings.index',
-                'icon' => 'bi bi-calendar-check',
-                'submenus' => [
-                    [
-                        'name' => 'Danh sách đặt phòng',
-                        'route' => 'admin.bookings.index',
-                    ],
-                ],
-            ],
-            [
                 'key' => 'buildings',
                 'name' => 'Tòa nhà',
                 'route' => 'building.index',
@@ -88,6 +76,30 @@ class SideBar extends Component
                     ],
                 ],
             ],
+            [
+                'key' => 'bookings',
+                'name' => 'Đặt phòng',
+                'route' => 'admin.bookings.index',
+                'icon' => 'bi bi-calendar-check',
+                'submenus' => [
+                    [
+                        'name' => 'Danh sách đặt phòng',
+                        'route' => 'admin.bookings.index',
+                    ],
+                ],
+            ],
+            [
+                'key' => 'contracts',
+                'name' => 'Hợp đồng',
+                'route' => 'admin.contracts.index',
+                'icon' => 'bi bi-file-earmark-text',
+                'submenus' => [
+                    [
+                        'name' => 'Danh sách hợp đồng',
+                        'route' => 'admin.contracts.index',
+                    ],
+                ]
+            ]
         ];
         return view('components.layouts.side-bar', [
             'menus' => $menus,
