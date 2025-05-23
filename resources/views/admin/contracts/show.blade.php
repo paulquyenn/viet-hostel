@@ -225,17 +225,20 @@
                                         </svg>
                                         Chỉnh sửa
                                     </a>
-                                    <button id="openSignModal"
-                                        class="btn btn-success d-inline-flex align-items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            fill="currentColor" viewBox="0 0 16 16" class="me-2">
-                                            <path
-                                                d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                                            <path fill-rule="evenodd"
-                                                d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
-                                        </svg>
-                                        Ký hợp đồng
-                                    </button>
+                                    <form method="POST" action="{{ route('admin.contracts.sign', $contract->id) }}"
+                                        class="d-inline">
+                                        @csrf
+                                        <button type="submit"
+                                            class="btn btn-success d-inline-flex align-items-center"
+                                            onclick="return confirm('Bạn có chắc chắn muốn xác nhận hợp đồng này?')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" viewBox="0 0 16 16" class="me-2">
+                                                <path
+                                                    d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
+                                            </svg>
+                                            Xác nhận hợp đồng
+                                        </button>
+                                    </form>
                                 @elseif($contract->status == 'active')
                                     <form action="{{ route('admin.contracts.terminate', $contract->id) }}"
                                         method="POST" class="d-inline">
@@ -260,44 +263,31 @@
         </div>
     </div>
 
-    <!-- Signature Modal -->
+    <!-- Confirmation Modal -->
     <div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="signatureModalLabel">Ký hợp đồng</h5>
+                    <h5 class="modal-title" id="signatureModalLabel">Xác nhận hợp đồng</h5>
                     <button type="button" class="btn-close" id="closeSignModal" data-bs-dismiss="modal"
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p class="mb-3 text-muted small">
-                        Bằng việc ký tên dưới đây, bạn với vai trò là chủ trọ xác nhận hợp đồng này.
+                        Bằng việc xác nhận, bạn với vai trò là chủ trọ chấp thuận hợp đồng này.
                     </p>
-
-                    <div class="mb-3">
-                        <label class="form-label">Chữ ký của bạn:</label>
-                        <div class="signature-pad border rounded">
-                            <canvas id="signature-pad" class="signature-canvas"></canvas>
-                        </div>
-                        <div class="mt-2">
-                            <button id="clear-signature" type="button" class="btn btn-sm btn-outline-secondary">
-                                Xóa chữ ký
-                            </button>
-                        </div>
-                    </div>
 
                     <form id="contract-sign-form" method="POST"
                         action="{{ route('admin.contracts.sign', $contract->id) }}">
                         @csrf
-                        <input type="hidden" name="signature_data" id="signature_data">
                         <div class="d-flex justify-content-end">
                             <button id="cancelSignModal" type="button" class="btn btn-outline-secondary me-2"
                                 data-bs-dismiss="modal">
                                 Hủy
                             </button>
                             <button type="submit" class="btn btn-success">
-                                Xác nhận ký hợp đồng
+                                Xác nhận hợp đồng
                             </button>
                         </div>
                     </form>
@@ -306,11 +296,6 @@
         </div>
     </div>
 
-    <!-- Include Signature Pad JS -->
-    <link rel="stylesheet" href="{{ asset('assets/css/signature-pad.css') }}">
-    <script src="{{ asset('node_modules/signature_pad/dist/signature_pad.min.js') }}"></script>
-    <script src="{{ asset('assets/js/signature-pad.js') }}"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Setup for signature modal
@@ -318,16 +303,6 @@
             const openBtn = document.getElementById('openSignModal');
             const closeBtn = document.getElementById('closeSignModal');
             const cancelBtn = document.getElementById('cancelSignModal');
-
-            // Ensure signature pad is initialized when modal opens
-            if (modal) {
-                modal.addEventListener('shown.bs.modal', function() {
-                    if (window.signaturePad) {
-                        window.signaturePad.clear();
-                        resizeCanvas(); // Make sure canvas is properly sized
-                    }
-                });
-            }
 
             if (openBtn) {
                 openBtn.addEventListener('click', function() {

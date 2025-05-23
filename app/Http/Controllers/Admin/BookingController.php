@@ -43,10 +43,10 @@ class BookingController extends Controller
             return redirect()->back()->with('error', 'Chỉ có thể duyệt yêu cầu đang chờ xử lý.');
         }
 
-        // Kiểm tra xem phòng còn trống không
+        // Kiểm tra xem phòng còn chỗ trống không
         $room = Room::find($booking->room_id);
-        if ($room->status !== 'Còn trống') {
-            return redirect()->back()->with('error', 'Phòng này đã có người thuê.');
+        if ($room->raw_status == 'occupied' && !$room->has_available_space) {
+            return redirect()->back()->with('error', 'Phòng này đã đầy, không thể duyệt đơn đặt phòng.');
         }
 
         $booking->status = 'approved';

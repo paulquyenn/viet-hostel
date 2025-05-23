@@ -43,7 +43,9 @@ return [
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
-            'throw' => false,
+            'throw' => true,
+            'timeout' => 180,
+            'max_upload_size' => 10240, // 10MB in KB
             'report' => false,
         ],
 

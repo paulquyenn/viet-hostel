@@ -171,7 +171,7 @@
                                                     <th class="bg-light">File hợp đồng</th>
                                                     <td>
                                                         @if ($booking->contract->file_path)
-                                                            <a href="{{ route('tenant.contracts.download', $booking->contract->id) }}"
+                                                            <a href="{{ route('admin.contracts.download', $booking->contract->id) }}"
                                                                 class="btn btn-sm btn-outline-primary">
                                                                 <i class="bi bi-download"></i> Tải xuống
                                                             </a>

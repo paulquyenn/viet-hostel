@@ -258,93 +258,41 @@ class ContractController extends Controller
     {
         $this->authorize('sign', $contract);
 
-        // Log user and contract information for debugging
-        \Log::info('Contract signing attempt', [
+        // Log user and contract information
+        \Log::info('Contract confirmation attempt', [
             'user_id' => auth()->id(),
             'user_role' => auth()->user()->getRoleNames()->first() ?? 'no role',
-            'contract_id' => $contract->id,
-            'has_signature_data' => $request->has('signature_data'),
+            'contract_id' => $contract->id
         ]);
-
-        // Validate signature data if provided
-        if ($request->has('signature_data')) {
-            $request->validate([
-                'signature_data' => 'required|string',
-            ]);
-
-            // Save signature as image
-            if ($request->signature_data) {
-                $signatureImage = $request->signature_data;
-                $signatureImage = str_replace('data:image/png;base64,', '', $signatureImage);
-                $signatureImage = str_replace(' ', '+', $signatureImage);
-
-                // Create directory if it doesn't exist
-                $dirPath = 'contracts/signatures';
-                if (!Storage::disk('public')->exists($dirPath)) {
-                    Storage::disk('public')->makeDirectory($dirPath);
-                }
-
-                $imageName = 'signature_' . $contract->id . '_' . time() . '.png';
-                $path = $dirPath . '/' . $imageName;
-
-                try {
-                    $success = Storage::disk('public')->put($path, base64_decode($signatureImage));
-                    \Log::info('Signature save result', ['success' => $success, 'path' => $path]);
-
-                    if ($success) {
-                        // Save signature file path to contract
-                        $contract->signature_path = $path;
-                    } else {
-                        return redirect()->back()->with('error', 'Không thể lưu chữ ký, vui lòng thử lại.');
-                    }
-                } catch (\Exception $e) {
-                    \Log::error('Error saving signature', ['error' => $e->getMessage()]);
-                    return redirect()->back()->with('error', 'Lỗi khi lưu chữ ký: ' . $e->getMessage());
-                }
-            }
-        }
 
         $contract->signed_at = now();
         $contract->status = 'active';
         $contract->save();
 
         // Log successful signing
-        \Log::info('Contract signed successfully', [
+        \Log::info('Contract confirmed successfully', [
             'user_id' => auth()->id(),
             'contract_id' => $contract->id,
         ]);
 
-        // Update room status to rented if not already
-        if ($contract->room && $contract->room->getRawOriginal('status') == 0) {
+        // Update room status to rented if needed
+        if ($contract->room) {
             $room = $contract->room;
-            $room->status = 1; // 1 = Đã thuê
-            $room->save();
+            // Nếu phòng đang trống, đánh dấu là đã có người thuê
+            if ($room->getRawOriginal('status') == 0) {
+                $room->status = 1; // 1 = Đã thuê
+                $room->save();
+            }
         }
 
         // Determine the appropriate redirect route based on user role
         if (auth()->user()->hasRole('admin')) {
             return redirect()->route('admin.contracts.show', $contract)
-                ->with('success', 'Hợp đồng đã được ký thành công.');
+                ->with('success', 'Hợp đồng đã được xác nhận thành công.');
         } else {
             return redirect()->route('tenant.contracts.show', $contract)
-                ->with('success', 'Hợp đồng đã được ký thành công.');
+                ->with('success', 'Hợp đồng đã được xác nhận thành công.');
         }
-
-        $contract->signed_at = now();
-        $contract->status = 'active';
-        $contract->save();
-
-        // Update room status to rented if not already
-        if ($contract->room->getRawOriginal('status') == 0) {
-            $room = $contract->room;
-            $room->status = 1; // 1 = Đã thuê
-            $room->save();
-        }
-
-        $redirectRoute = Auth::user()->hasRole('admin') ? 'admin.contracts.index' : 'tenant.contracts.index';
-
-        return redirect()->route($redirectRoute)
-            ->with('success', 'Đã ký hợp đồng thành công.');
     }
     /**
      * Chấm dứt hợp đồng (Admin)

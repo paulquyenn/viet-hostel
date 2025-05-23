@@ -50,6 +50,7 @@
         <form class="dropzone needsclick dropzone" id="upload" method="POST" action="{{ $route }}">
             @csrf
             <input type="hidden" name="{{ $name }}" value="{{ $id }}">
+            <input type="hidden" name="uploaded_image_ids" id="uploaded_image_ids" value="">
             <div class="dz-message needsclick">
                 Drop files here or click to upload.<br>
             </div>
@@ -68,9 +69,29 @@
             autoProcessQueue: true,
             uploadMultiple: true,
             maxFiles: 5,
-            parallelUploads: 100,
+            maxFilesize: 10, // MB
+            acceptedFiles: 'image/*',
+            parallelUploads: 5,
+            timeout: 180000, // milliseconds,
+            headers: {
+                'X-CSRF-TOKEN': "{{ csrf_token() }}"
+            },
+            dictFileTooBig: "File quá lớn (@{{ filesize }}MB). Kích thước tối đa: @{{ maxfilesize }}MB",
+            dictInvalidFileType: 'Định dạng file không được hỗ trợ',
+            dictMaxFilesExceeded: 'Không thể tải lên thêm file',
             init: function() {
                 var myDropzone = this;
+
+                this.on("error", function(file, errorMessage) {
+                    console.error('Upload error:', errorMessage);
+                    if (typeof errorMessage === 'string') {
+                        this.emit("error", file, errorMessage);
+                    } else if (errorMessage.errors) {
+                        // Handle Laravel validation errors
+                        let messages = Object.values(errorMessage.errors).flat();
+                        this.emit("error", file, messages.join('\n'));
+                    }
+                });
 
                 this.element.querySelector("button[type=submit]").addEventListener("click",
                     function(e) {
@@ -99,11 +120,28 @@
                 this.on("sendingmultiple", function() {});
                 this.on("successmultiple", function(files, response) {
                     console.log('Upload success:', response);
-                    arrFiles.push(...response.data);
+                    if (response && response.data) {
+                        arrFiles.push(...response.data);
+
+                        // Cập nhật input ẩn với ID của ảnh đã tải lên
+                        updateUploadedImageIds();
+
+                        // Kích hoạt sự kiện tùy chỉnh để thông báo cho form chính
+                        const uploadSuccessEvent = new CustomEvent('imagesUploaded', {
+                            detail: {
+                                imageIds: response.data.map(img => img.id)
+                            }
+                        });
+                        document.dispatchEvent(uploadSuccessEvent);
+                    } else {
+                        console.error('Response data is missing or invalid:', response);
+                    }
                 });
+
                 this.on("errormultiple", function(files, response) {
                     console.error('Upload error:', response);
                 });
+
                 this.on("removedfile", function(file) {
                     console.log('File removed:', file);
                     console.log('arrFiles:', arrFiles);
@@ -119,6 +157,8 @@
                             },
                             success: function(data) {
                                 console.log('File removed:', data);
+                                // Cập nhật lại input ẩn sau khi xóa ảnh
+                                removeImageIdFromInput(fileRm.id);
                             },
                             error: function(data) {
                                 console.error('File removed:', data);
@@ -134,9 +174,34 @@
             btnSubmit.addEventListener('click', function(e) {
                 e.preventDefault();
                 document.querySelector('.button-submit-files').click();
+                // Đảm bảo đã cập nhật input ẩn trước khi gửi form
+                updateUploadedImageIds();
                 this.closest('form').submit();
             });
         }
     });
+
+    // Hàm cập nhật input ẩn với ID của tất cả ảnh đã tải lên
+    function updateUploadedImageIds() {
+        const imageIds = arrFiles.map(file => file.id).filter(id => id);
+        document.getElementById('uploaded_image_ids').value = JSON.stringify(imageIds);
+    }
+
+    // Hàm xóa ID ảnh khỏi input ẩn
+    function removeImageIdFromInput(imageId) {
+        let imageIds = [];
+        try {
+            imageIds = JSON.parse(document.getElementById('uploaded_image_ids').value || '[]');
+        } catch (e) {
+            console.error('Error parsing image IDs:', e);
+        }
+
+        const index = imageIds.indexOf(imageId);
+        if (index !== -1) {
+            imageIds.splice(index, 1);
+        }
+
+        document.getElementById('uploaded_image_ids').value = JSON.stringify(imageIds);
+    }
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

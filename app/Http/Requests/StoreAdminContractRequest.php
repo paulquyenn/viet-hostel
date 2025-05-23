@@ -24,8 +24,8 @@ class StoreAdminContractRequest extends FormRequest
         return [
             'room_id' => ['required', 'exists:rooms,id'],
             'booking_id' => ['nullable', 'exists:bookings,id'],
-            'tenant_id' => ['required', 'exists:tenants,id'],
-            'landlord_id' => ['required', 'exists:landlords,id'],
+            'tenant_id' => ['required', 'exists:users,id'],
+            'landlord_id' => ['required', 'exists:users,id'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after:start_date'],
             'monthly_rent' => ['required', 'numeric', 'min:0'],

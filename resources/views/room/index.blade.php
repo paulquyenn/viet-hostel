@@ -13,6 +13,22 @@
                     </div>
 
                     <div class="card-body">
+                        @if (session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        @endif
+
+                        @if (session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                        @endif
+
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped">
                                 <thead>
@@ -38,10 +54,10 @@
                                             <td>{{ number_format($room->price) }} đ</td>
                                             <td>{{ number_format($room->deposit) }} đ</td>
                                             <td>
-                                                @if ($room->status == 0)
-                                                    <span class="badge bg-success">Còn Trống</span>
-                                                @elseif($room->status == 1)
-                                                    <span class="badge bg-primary">Đã thuê</span>
+                                                @if ($room->status === 'available')
+                                                    <span class="badge bg-success">{{ $room->status_text }}</span>
+                                                @else
+                                                    <span class="badge bg-primary">{{ $room->status_text }}</span>
                                                 @endif
                                             </td>
                                             <td>{{ $room->max_person }}</td>

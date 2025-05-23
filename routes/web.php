@@ -70,21 +70,21 @@ Route::middleware('auth')->group(function () {
     // Routes for admin booking & contract management
     Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
         // Admin booking routes - direct control in controller
-        Route::get('/bookings', [BookingController::class, 'adminIndex'])->name('bookings.index');
-        Route::get('/bookings/{booking}', [BookingController::class, 'adminShow'])->name('bookings.show');
-        Route::post('/bookings/{booking}/approve', [BookingController::class, 'approve'])->name('bookings.approve');
-        Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject'])->name('bookings.reject');
+        Route::get('/bookings', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings.index');
+        Route::get('/bookings/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'show'])->name('bookings.show');
+        Route::post('/bookings/{booking}/approve', [\App\Http\Controllers\Admin\BookingController::class, 'approve'])->name('bookings.approve');
+        Route::post('/bookings/{booking}/reject', [\App\Http\Controllers\Admin\BookingController::class, 'reject'])->name('bookings.reject');
 
         // Admin contract routes
-        Route::get('/contracts', [ContractController::class, 'adminIndex'])->name('contracts.index');
-        Route::get('/contracts/create/{booking}', [ContractController::class, 'create'])->name('contracts.create');
-        Route::post('/contracts', [ContractController::class, 'store'])->name('contracts.store');
-        Route::get('/contracts/{contract}', [ContractController::class, 'adminShow'])->name('contracts.show');
+        Route::get('/contracts', [\App\Http\Controllers\Admin\ContractController::class, 'index'])->name('contracts.index');
+        Route::get('/contracts/create/{booking}', [\App\Http\Controllers\Admin\ContractController::class, 'create'])->name('contracts.create');
+        Route::post('/contracts', [\App\Http\Controllers\Admin\ContractController::class, 'store'])->name('contracts.store');
+        Route::get('/contracts/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'show'])->name('contracts.show');
         Route::get('/contracts/{contract}/download', [ContractController::class, 'download'])->name('contracts.download');
-        Route::get('/contracts/{contract}/edit', [ContractController::class, 'edit'])->name('contracts.edit');
-        Route::put('/contracts/{contract}', [ContractController::class, 'update'])->name('contracts.update');
-        Route::post('/contracts/{contract}/sign', [ContractController::class, 'sign'])->name('contracts.sign');
-        Route::post('/contracts/{contract}/terminate', [ContractController::class, 'terminate'])->name('contracts.terminate');
+        Route::get('/contracts/{contract}/edit', [\App\Http\Controllers\Admin\ContractController::class, 'edit'])->name('contracts.edit');
+        Route::put('/contracts/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'update'])->name('contracts.update');
+        Route::post('/contracts/{contract}/sign', [\App\Http\Controllers\Admin\ContractController::class, 'sign'])->name('contracts.sign');
+        Route::post('/contracts/{contract}/terminate', [\App\Http\Controllers\Admin\ContractController::class, 'terminate'])->name('contracts.terminate');
     });
 });
 

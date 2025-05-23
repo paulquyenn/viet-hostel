@@ -11,6 +11,43 @@
                         <x-room-image :route="route('image.store')" :name="'room_id'" :id="$room_id['id'] ?? null" />
                         <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
+                            <input type="hidden" name="image_ids" id="image_ids">
+                            <script>
+                                // Mảng lưu trữ ID ảnh đã tải lên
+                                let uploadedImageIds = [];
+
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    // Lắng nghe sự kiện khi ảnh được tải lên thành công
+                                    document.addEventListener('imagesUploaded', function(event) {
+                                        // Thêm ID ảnh mới vào mảng
+                                        if (event.detail && event.detail.imageIds) {
+                                            uploadedImageIds = uploadedImageIds.concat(event.detail.imageIds);
+                                            // Cập nhật input ẩn
+                                            document.getElementById('image_ids').value = JSON.stringify(uploadedImageIds);
+                                            console.log('Uploaded image IDs updated:', uploadedImageIds);
+                                        }
+                                    });
+
+                                    // Cập nhật input ẩn khi form được gửi
+                                    const form = document.querySelector('form[action="{{ route('room.store') }}"]');
+                                    form.addEventListener('submit', function() {
+                                        // Lấy giá trị từ input ẩn trong dropzone nếu có
+                                        const dropzoneInput = document.getElementById('uploaded_image_ids');
+                                        if (dropzoneInput && dropzoneInput.value) {
+                                            try {
+                                                const dropzoneImageIds = JSON.parse(dropzoneInput.value);
+                                                // Hợp nhất với ID đã thu thập
+                                                uploadedImageIds = [...new Set([...uploadedImageIds, ...dropzoneImageIds])];
+                                            } catch (e) {
+                                                console.error('Error parsing dropzone image IDs:', e);
+                                            }
+                                        }
+
+                                        document.getElementById('image_ids').value = JSON.stringify(uploadedImageIds);
+                                        console.log('Final image IDs:', uploadedImageIds);
+                                    });
+                                });
+                            </script>
 
                             <div class="row mb-3">
                                 <div class="col-md-6">

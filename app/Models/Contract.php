@@ -73,6 +73,7 @@ class Contract extends Model
             'expired' => 'Đã hết hạn',
             'terminated' => 'Đã chấm dứt',
             'pending' => 'Đang chờ ký',
+            'tenant_approved' => 'Đã được người thuê xác nhận',
         ][$this->status] ?? $this->status;
     }
 

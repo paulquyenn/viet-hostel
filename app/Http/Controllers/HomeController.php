@@ -31,10 +31,26 @@ class HomeController extends Controller
         // Load room with its relationships
         $room = $room->load(['building.province', 'building.district', 'building.ward', 'images', 'reviews.user']);
 
+        // Get current tenants (users with active contracts)
+        $currentTenants = $room->contracts()
+            ->whereIn('status', ['active', 'approved'])
+            ->with('tenant')
+            ->get()
+            ->pluck('tenant');
+
         // Get similar rooms based on criteria
         $similarRooms = Room::query()
             ->where('id', '!=', $room->id) // Exclude current room
-            ->where('status', 0) // Only available rooms (status = 0 means available)
+            ->where(function($q) {
+                // Include rooms that are available
+                $q->where('status', 'available')
+                  // Or rooms that have available spots
+                  ->orWhereRaw("status = 'occupied' AND max_person > (
+                      SELECT COUNT(*) FROM contracts
+                      WHERE contracts.room_id = rooms.id
+                      AND contracts.status IN ('active', 'approved')
+                  )");
+            })
             ->where(function ($query) use ($room) {
                 $query->where('building_id', $room->building_id) // Same building
                     ->orWhereBetween('price', [$room->price * 0.8, $room->price * 1.2]); // Price range within ±20%
@@ -46,6 +62,7 @@ class HomeController extends Controller
         return view('motel-detail', [
             'room' => $room,
             'similarRooms' => $similarRooms,
+            'currentTenants' => $currentTenants,
         ]);
     }
 
@@ -103,9 +120,34 @@ class HomeController extends Controller
         }
 
         if ($request->has('status')) {
-            $query->where('status', $request->status);
+            if ($request->status === 'available') {
+                // Filter for completely available rooms
+                $query->where('status', 'available');
+            } else {
+                // Filter for rooms with any available spots
+                $query->where(function($q) {
+                    // Include available rooms
+                    $q->where('status', 'available')
+                      // Or rooms that have available spots
+                      ->orWhereRaw("status = 'occupied' AND max_person > (
+                          SELECT COUNT(*) FROM contracts
+                          WHERE contracts.room_id = rooms.id
+                          AND contracts.status IN ('active', 'approved')
+                      )");
+                });
+            }
         } else {
-            $query->where('status', 0); // 0 = Còn trống
+            // Default - show all rooms with any available space
+            $query->where(function($q) {
+                // Include rooms that are completely available
+                $q->where('status', 'available')
+                  // Or rooms that have available spots
+                  ->orWhereRaw("status = 'occupied' AND max_person > (
+                      SELECT COUNT(*) FROM contracts
+                      WHERE contracts.room_id = rooms.id
+                      AND contracts.status IN ('active', 'approved')
+                  )");
+            });
         }
 
         $rooms = $query->paginate(9)->appends($request->all());

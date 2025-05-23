@@ -18,7 +18,6 @@
         "vite": "^6.2.5"
     },
     "dependencies": {
-        "dropzone": "^6.0.0-beta.2",
-        "signature_pad": "^5.0.7"
+        "dropzone": "^6.0.0-beta.2"
     }
 }

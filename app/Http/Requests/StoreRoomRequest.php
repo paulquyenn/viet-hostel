@@ -26,7 +26,7 @@ class StoreRoomRequest extends FormRequest
             'area' => ['required', 'numeric', 'min:0'],
             'price' => ['required', 'numeric', 'min:0'],
             'deposit' => ['required', 'numeric', 'min:0'],
-            'status' => ['required', 'in:0,1'],
+            'status' => ['required', 'in:available,occupied'],
             'max_person' => ['required', 'integer', 'min:1'],
             'utilities' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],

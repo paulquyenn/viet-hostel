@@ -17,9 +17,9 @@ class Image extends Model
         'isMain'
     ];
 
-    public function room()
+    public function rooms()
     {
-        return $this->hasMany(Room::class, 'room_images');
+        return $this->belongsToMany(Room::class, 'room_images');
     }
 
     public function roomImage()

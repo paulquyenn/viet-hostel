@@ -103,12 +103,14 @@
                                     <tr>
                                         <th width="40%">Trạng thái</th>
                                         <td>
-                                            @if ($room->status == 0)
-                                                <span class="badge bg-success">Trống</span>
-                                            @elseif($room->status == 1)
-                                                <span class="badge bg-primary">Đã thuê</span>
+                                            @if ($room->status === 'available')
+                                                <span class="badge bg-success">{{ $room->status_text }}</span>
                                             @else
-                                                <span class="badge bg-warning">Đang bảo trì</span>
+                                                @if ($room->has_available_space)
+                                                    <span class="badge bg-warning">{{ $room->status_text }}</span>
+                                                @else
+                                                    <span class="badge bg-primary">{{ $room->status_text }}</span>
+                                                @endif
                                             @endif
                                         </td>
                                     </tr>

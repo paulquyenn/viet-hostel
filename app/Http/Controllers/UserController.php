@@ -98,11 +98,11 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if ($user->role == 'admin') {
-            return redirect()->route('user.index');
+        if ($user->hasRole('admin')) {
+            return redirect()->route('user.index')->with('error', 'Không thể xóa tài khoản admin.');
         }
 
         $user->delete();
-        return redirect()->route('user.index');
+        return redirect()->route('user.index')->with('success', 'Người dùng đã được xóa thành công.');
     }
 }

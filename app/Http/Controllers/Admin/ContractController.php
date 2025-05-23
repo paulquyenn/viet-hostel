@@ -48,7 +48,7 @@ class ContractController extends Controller
         }
 
         // Lấy danh sách phòng trống (nếu không chọn phòng từ booking)
-        $rooms = Room::where('status', 0)->with('building')->get();
+        $rooms = Room::where('status', 'available')->with('building')->get();
 
         // Lấy danh sách người thuê tiềm năng (nếu không chọn người thuê từ booking)
         $tenants = User::role('tenant')->get();
@@ -78,9 +78,9 @@ class ContractController extends Controller
             'contract_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
         ]);
 
-        // Kiểm tra xem phòng có trạng thái "Còn trống" không
+        // Kiểm tra xem phòng có trạng thái "available" không
         $room = Room::find($validated['room_id']);
-        if ($room->status !== 'Còn trống') {
+        if ($room->status !== 'available') {
             return redirect()->back()->with('error', 'Phòng này đã có người thuê.');
         }
 
@@ -110,9 +110,9 @@ class ContractController extends Controller
         $contract->file_path = $filePath;
         $contract->save();
 
-        // Cập nhật trạng thái phòng thành "Đã thuê"
+        // Cập nhật trạng thái phòng thành "occupied"
         $room = Room::find($validated['room_id']);
-        $room->status = 1; // Đã thuê
+        $room->status = 'occupied';
         $room->save();
 
         // Cập nhật booking nếu có
@@ -152,7 +152,7 @@ class ContractController extends Controller
 
         // Lấy danh sách phòng trống và phòng hiện tại
         $rooms = Room::where(function ($query) use ($contract) {
-            $query->where('status', 0) // Phòng trống
+            $query->where('status', 'available') // Phòng trống
                 ->orWhere('id', $contract->room_id); // Hoặc phòng hiện tại
         })->with('building')->get();
 
@@ -189,17 +189,17 @@ class ContractController extends Controller
         // Nếu thay đổi phòng, cần kiểm tra trạng thái phòng mới
         if ($validated['room_id'] != $contract->room_id) {
             $room = Room::find($validated['room_id']);
-            if ($room->status !== 'Còn trống') {
+            if ($room->status !== 'available') {
                 return redirect()->back()->with('error', 'Phòng này đã có người thuê.');
             }
 
-            // Cập nhật trạng thái phòng cũ thành "Còn trống"
+            // Cập nhật trạng thái phòng cũ thành "available"
             $oldRoom = Room::find($contract->room_id);
-            $oldRoom->status = 0; // Còn trống
+            $oldRoom->status = 'available';
             $oldRoom->save();
 
-            // Cập nhật trạng thái phòng mới thành "Đã thuê"
-            $room->status = 1; // Đã thuê
+            // Cập nhật trạng thái phòng mới thành "occupied"
+            $room->status = 'occupied';
             $room->save();
         }
 
@@ -231,13 +231,13 @@ class ContractController extends Controller
     }
 
     /**
-     * Ký hợp đồng
+     * Xác nhận hợp đồng
      */
-    public function sign(Contract $contract)
+    public function sign(Request $request, Contract $contract)
     {
-        // Chỉ cho phép ký hợp đồng chưa ký
+        // Chỉ cho phép xác nhận hợp đồng chưa ký
         if ($contract->isSigned()) {
-            return redirect()->back()->with('error', 'Hợp đồng này đã được ký.');
+            return redirect()->back()->with('error', 'Hợp đồng này đã được xác nhận.');
         }
 
         $contract->signed_at = now();
@@ -245,7 +245,7 @@ class ContractController extends Controller
         $contract->save();
 
         return redirect()->route('admin.contracts.show', $contract)
-            ->with('success', 'Đã ký hợp đồng thành công.');
+            ->with('success', 'Đã xác nhận hợp đồng thành công.');
     }
 
     /**

@@ -154,7 +154,7 @@
                                 <div class="ps-3">
                                     <h6>{{ \App\Models\Room::whereHas('building', function ($q) {
                                         $q->where('user_id', auth()->id());
-                                    })->where('status', 0)->count() }}
+                                    })->where('status', 'available')->count() }}
                                     </h6>
                                 </div>
                             </div>
@@ -173,7 +173,7 @@
                                 <div class="ps-3">
                                     <h6>{{ \App\Models\Room::whereHas('building', function ($q) {
                                         $q->where('user_id', auth()->id());
-                                    })->where('status', 1)->count() }}
+                                    })->where('status', 'occupied')->count() }}
                                     </h6>
                                 </div>
                             </div>

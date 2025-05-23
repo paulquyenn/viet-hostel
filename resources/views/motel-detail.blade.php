@@ -194,10 +194,10 @@
                         <div class="md:max-w-3xl">
                             <div class="flex items-center mb-3">
                                 <div
-                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $room->status == 'Còn trống' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} mr-2">
+                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $room->status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} mr-2">
                                     <span
-                                        class="w-2 h-2 rounded-full {{ $room->status == 'Còn trống' ? 'bg-green-500' : 'bg-red-500' }} mr-1"></span>
-                                    {{ $room->status }}
+                                        class="w-2 h-2 rounded-full {{ $room->status === 'available' ? 'bg-green-500' : 'bg-red-500' }} mr-1"></span>
+                                    {{ $room->status_text }}
                                 </div>
                                 @if ($room->created_at->diffInDays(now()) < 7)
                                     <span
@@ -261,7 +261,7 @@
                                         <span class="text-lg">VND</span></span>
                                 </div>
                                 <div id="contact" class="mt-4 flex flex-col space-y-2">
-                                    @if ($room->status == 'Còn trống')
+                                    @if ($room->has_available_space)
                                         <a href="{{ route('tenant.bookings.create', $room->id) }}"
                                             class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition duration-200 font-medium">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2"
@@ -491,6 +491,59 @@
                                                 phòng. Vui lòng liên hệ với chủ nhà để biết thêm chi tiết.</p>
                                         </div>
                                     </div>
+
+                                    <!-- Current Tenants Section -->
+                                    @if ($room->current_tenant_count > 0 && isset($currentTenants) && $currentTenants->count() > 0)
+                                        <div class="mt-10">
+                                            <h3 class="text-xl font-bold text-gray-900 mb-5 flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                    class="h-6 w-6 mr-2 text-indigo-500" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                </svg>
+                                                Người đang thuê
+                                                ({{ $room->current_tenant_count }}/{{ $room->max_person }})
+                                            </h3>
+
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                @foreach ($currentTenants as $tenant)
+                                                    <div
+                                                        class="flex items-center p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors duration-200">
+                                                        <div
+                                                            class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3 flex-shrink-0">
+                                                            <span
+                                                                class="text-indigo-700 font-medium">{{ substr($tenant->name, 0, 1) }}</span>
+                                                        </div>
+                                                        <div>
+                                                            <h4 class="font-medium text-gray-900">{{ $tenant->name }}
+                                                            </h4>
+                                                            <p class="text-sm text-gray-500">
+                                                                Thuê từ:
+                                                                {{ \Carbon\Carbon::parse($room->contracts->where('tenant_id', $tenant->id)->first()->start_date ?? '')->format('d/m/Y') }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
+                                            @if ($room->has_available_space)
+                                                <div
+                                                    class="mt-4 p-3 bg-green-50 text-green-800 rounded-lg flex items-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-5 w-5 mr-2 text-green-500" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <span>Còn {{ $room->available_spots }} chỗ trống. Bạn có thể đặt
+                                                        phòng ngay!</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 

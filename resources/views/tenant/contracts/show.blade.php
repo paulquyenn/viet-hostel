@@ -48,6 +48,11 @@
                                         class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
                                         {{ $contract->status_text }}
                                     </span>
+                                @elseif($contract->status == 'tenant_approved')
+                                    <span
+                                        class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                                        {{ $contract->status_text }}
+                                    </span>
                                 @elseif($contract->status == 'active')
                                     <span
                                         class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
@@ -174,7 +179,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                         </svg>
-                                        Ký hợp đồng
+                                        Xác nhận hợp đồng
                                     </button>
                                 @endif
                             </div>
@@ -185,13 +190,13 @@
         </div>
     </div>
 
-    <!-- Signature Modal -->
+    <!-- Confirmation Modal -->
     <div id="signatureModal"
         class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
             <div class="px-6 py-4 border-b border-gray-200">
                 <div class="flex items-start justify-between">
-                    <h3 class="text-lg font-medium text-gray-900">Ký hợp đồng</h3>
+                    <h3 class="text-lg font-medium text-gray-900">Xác nhận hợp đồng</h3>
                     <button id="closeSignModal" class="text-gray-400 hover:text-gray-500">
                         <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -203,27 +208,12 @@
             </div>
             <div class="px-6 py-4">
                 <p class="mb-4 text-sm text-gray-600">
-                    Bằng việc ký tên dưới đây, bạn xác nhận đã đọc, hiểu và đồng ý với tất cả điều khoản và điều kiện
-                    của hợp đồng thuê phòng này.
+                    Bằng việc xác nhận, bạn đồng ý với tất cả điều khoản và điều kiện của hợp đồng thuê phòng này.
                 </p>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Chữ ký của bạn:</label>
-                    <div class="signature-pad">
-                        <canvas id="signature-pad" class="signature-canvas"></canvas>
-                    </div>
-                    <div class="signature-pad-buttons">
-                        <button id="clear-signature" type="button"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            Xóa chữ ký
-                        </button>
-                    </div>
-                </div>
 
                 <form id="contract-sign-form" method="POST"
                     action="{{ route('tenant.contracts.sign', $contract->id) }}">
                     @csrf
-                    <input type="hidden" name="signature_data" id="signature_data">
                     <div class="flex justify-end">
                         <button id="cancelSignModal" type="button"
                             class="mr-3 bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -231,18 +221,13 @@
                         </button>
                         <button type="submit"
                             class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                            Xác nhận ký hợp đồng
+                            Xác nhận hợp đồng
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-
-    <!-- Include Signature Pad JS -->
-    <link rel="stylesheet" href="{{ asset('assets/css/signature-pad.css') }}">
-    <script src="{{ asset('node_modules/signature_pad/dist/signature_pad.min.js') }}"></script>
-    <script src="{{ asset('assets/js/signature-pad.js') }}"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

@@ -115,7 +115,7 @@
                                                         </a>
 
                                                         @if ($contract->file_path)
-                                                            <a href="{{ route('tenant.contracts.download', $contract->id) }}"
+                                                            <a href="{{ route('admin.contracts.download', $contract->id) }}"
                                                                 class="btn btn-sm btn-outline-success">
                                                                 <i class="bi bi-download"></i> Tải xuống
                                                             </a>
@@ -125,12 +125,12 @@
                                                     <div class="mt-2">
                                                         @if ($contract->status == 'pending' && !$contract->isSigned())
                                                             <form method="POST"
-                                                                action="{{ route('tenant.contracts.sign', $contract->id) }}"
+                                                                action="{{ route('admin.contracts.sign', $contract->id) }}"
                                                                 class="d-inline">
                                                                 @csrf
                                                                 <button type="submit" class="btn btn-sm btn-primary"
-                                                                    onclick="return confirm('Bạn có chắc chắn muốn ký hợp đồng này?')">
-                                                                    <i class="bi bi-pen"></i> Ký hợp đồng
+                                                                    onclick="return confirm('Bạn có chắc chắn muốn xác nhận hợp đồng này?')">
+                                                                    <i class="bi bi-check-circle"></i> Xác nhận hợp đồng
                                                                 </button>
                                                             </form>
                                                         @endif

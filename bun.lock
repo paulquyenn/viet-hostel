@@ -4,7 +4,6 @@
     "": {
       "dependencies": {
         "dropzone": "^6.0.0-beta.2",
-        "signature_pad": "^5.0.7",
       },
       "devDependencies": {
         "@tailwindcss/forms": "^0.5.10",
@@ -436,8 +435,6 @@
     "shell-quote": ["shell-quote@1.8.2", "", {}, "sha512-AzqKpGKjrj7EM6rKVQEPpB288oCfnrEIuyoT9cyF4nmGa7V8Zk6f7RRqYisX8X9m+Q7bd632aZW4ky7EhbQztA=="],
 
     "signal-exit": ["signal-exit@4.1.0", "", {}, "sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw=="],
-
-    "signature_pad": ["signature_pad@5.0.7", "", {}, "sha512-j2C6NTZ3c99G3hvFTsg6oOWy/tmftgwIXrvsr3+99+5SuPW6OdSpo++ZUzLVNfNHYmp2Z2Al76YV/3RhS/nDJg=="],
 
     "source-map-js": ["source-map-js@1.2.1", "", {}, "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA=="],
 

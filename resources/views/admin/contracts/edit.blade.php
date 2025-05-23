@@ -216,7 +216,7 @@
                                                     <p class="form-label mb-2">File hiện tại:</p>
                                                     <div class="d-flex align-items-center">
                                                         <i class="bi bi-file-earmark me-2 text-secondary"></i>
-                                                        <a href="{{ route('tenant.contracts.download', $contract->id) }}"
+                                                        <a href="{{ route('admin.contracts.download', $contract->id) }}"
                                                             class="text-primary">
                                                             Tải xuống file hiện tại
                                                         </a>
@@ -252,7 +252,7 @@
                                                     thay đổi, vui lòng chấm dứt hợp đồng hiện tại và tạo hợp đồng mới.
                                                 </p>
                                                 <div>
-                                                    <a href="{{ route('tenant.contracts.download', $contract->id) }}"
+                                                    <a href="{{ route('admin.contracts.download', $contract->id) }}"
                                                         class="btn btn-outline-warning btn-sm me-2">
                                                         Tải xuống hợp đồng
                                                     </a>

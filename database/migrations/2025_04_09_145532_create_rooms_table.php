@@ -17,7 +17,7 @@ return new class extends Migration
             $table->float('area');
             $table->decimal('price', 10, 2);
             $table->decimal('deposit', 10, 2);
-            $table->tinyInteger('status')->default(0);
+            $table->enum('status', ['available', 'occupied'])->default('available');
             $table->integer('max_person')->default(1);
             $table->text('utilities')->nullable();
             $table->text('description')->nullable();

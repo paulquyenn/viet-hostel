@@ -13,6 +13,25 @@
                         <form action="{{ route('room.update', $room) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
+                            <input type="hidden" name="new_image_ids" id="new_image_ids">
+
+                            <script>
+                                // Mảng lưu trữ ID ảnh mới đã tải lên
+                                let newUploadedImageIds = [];
+
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    // Lắng nghe sự kiện khi ảnh được tải lên thành công
+                                    document.addEventListener('imagesUploaded', function(event) {
+                                        // Thêm ID ảnh mới vào mảng
+                                        if (event.detail && event.detail.imageIds) {
+                                            newUploadedImageIds = newUploadedImageIds.concat(event.detail.imageIds);
+                                            // Cập nhật input ẩn
+                                            document.getElementById('new_image_ids').value = JSON.stringify(newUploadedImageIds);
+                                            console.log('New uploaded image IDs:', newUploadedImageIds);
+                                        }
+                                    });
+                                });
+                            </script>
 
                             <div class="row mb-3">
                                 <div class="col-md-6">

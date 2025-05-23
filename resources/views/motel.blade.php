@@ -91,14 +91,14 @@
                                     </svg>
                                     <span>Trên 20m²</span>
                                 </a>
-                                <a href="{{ route('motel', ['status' => '0']) }}"
+                                <a href="{{ route('motel', ['status' => 'available']) }}"
                                     class="bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full hover:bg-white/30 transition-all duration-300 flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 md:h-4 md:w-4 mr-1"
                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <span>Còn trống</span>
+                                    <span>Còn chỗ trống</span>
                                 </a>
                                 <a href="{{ route('motel') }}"
                                     class="bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full hover:bg-white/30 transition-all duration-300 flex items-center">
@@ -251,9 +251,9 @@
                         class="flex flex-col md:flex-row md:items-center justify-between pt-4 border-t border-gray-100">
                         <div class="mb-4 md:mb-0">
                             <label class="inline-flex items-center">
-                                <input type="checkbox" name="status" value="0"
+                                <input type="checkbox" name="status" value="available"
                                     class="h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                                    {{ request('status') === '0' || request('status') === null ? 'checked' : '' }}>
+                                    {{ request('status') === 'available' || request('status') === null ? 'checked' : '' }}>
                                 <span class="ml-2 text-gray-700 text-sm">Chỉ hiển thị phòng còn trống</span>
                             </label>
                         </div>
@@ -325,7 +325,7 @@
                                     <span class="font-medium">{{ number_format($room->price) }} đ/tháng</span>
                                 </div>
                                 <div
-                                    class="absolute top-0 left-0 {{ $room->status == 'Còn trống' ? 'bg-green-500' : 'bg-red-500' }} text-white px-2 py-1 m-2 rounded-md text-sm">
+                                    class="absolute top-0 left-0 {{ $room->has_available_space ? 'bg-green-500' : 'bg-red-500' }} text-white px-2 py-1 m-2 rounded-md text-sm">
                                     <span class="font-medium">{{ $room->status }}</span>
                                 </div>
 

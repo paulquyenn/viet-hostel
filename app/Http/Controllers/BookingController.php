@@ -26,9 +26,9 @@ class BookingController extends Controller
      */
     public function create(Room $room)
     {
-        // Kiểm tra xem phòng có trạng thái "Còn trống" không
-        if ($room->status !== 'Còn trống') {
-            return redirect()->back()->with('error', 'Phòng này đã có người thuê.');
+        // Kiểm tra xem phòng có còn chỗ trống hay không
+        if (!$room->has_available_space) {
+            return redirect()->back()->with('error', 'Phòng này đã đầy, không thể đặt thêm.');
         }
 
         return view('tenant.bookings.create', compact('room'));
@@ -39,9 +39,9 @@ class BookingController extends Controller
      */
     public function store(Request $request, Room $room)
     {
-        // Kiểm tra xem phòng có trạng thái "Còn trống" không
-        if ($room->status !== 'Còn trống') {
-            return redirect()->back()->with('error', 'Phòng này đã có người thuê.');
+        // Kiểm tra xem phòng có còn chỗ trống hay không
+        if (!$room->has_available_space) {
+            return redirect()->back()->with('error', 'Phòng này đã đầy, không thể đặt thêm.');
         }
 
         // Validate dữ liệu đầu vào
@@ -142,18 +142,21 @@ class BookingController extends Controller
             return redirect()->back()->with('error', 'Không thể duyệt yêu cầu đặt phòng này.');
         }
 
-        // Kiểm tra xem phòng có còn trống không
-        if ($booking->room->getRawOriginal('status') != 0) {
-            return redirect()->back()->with('error', 'Phòng đã có người thuê, không thể duyệt đơn đặt phòng.');
+        // Kiểm tra xem phòng có còn chỗ trống không
+        $room = $booking->room;
+        if (!$room->has_available_space) {
+            return redirect()->back()->with('error', 'Phòng này đã đầy, không thể duyệt đơn đặt phòng.');
         }
 
         $booking->status = 'approved';
         $booking->save();
 
-        // Cập nhật trạng thái phòng thành đã thuê
-        $room = $booking->room;
-        $room->status = 1; // 1 = Đã thuê
-        $room->save();
+        // Cập nhật trạng thái phòng
+        // Nếu phòng đang trống, đổi status thành 'occupied'
+        if ($room->status === 'available') {
+            $room->status = 'occupied';
+            $room->save();
+        }
 
         return redirect()->route('admin.bookings.index')
             ->with('success', 'Đã duyệt yêu cầu đặt phòng thành công.');

@@ -11,7 +11,8 @@ class AdminRoleMiddleware
 {
     /**
      * Handle an incoming request.
-     */    public function handle(Request $request, Closure $next): Response
+     */
+    public function handle(Request $request, Closure $next): Response
     {
         // Log for debugging
         Log::info('AdminRoleMiddleware: checking if user has admin role');

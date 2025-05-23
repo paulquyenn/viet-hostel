@@ -31,6 +31,10 @@ Route::middleware('auth')->prefix('api')->group(function () {
     Route::resource('room', RoomController::class)->only('store', 'update', 'destroy');
     Route::resource('image', ImageController::class)->only('store', 'update', 'destroy');
     Route::resource('room_image', RoomImageController::class)->only('store', 'update', 'destroy');
-    Route::resource('review', ReviewController::class)->only('store', 'update', 'destroy');
+    Route::resource('review', ReviewController::class)->only('store', 'update', 'destroy')->names([
+        'store' => 'api.review.store',
+        'update' => 'api.review.update',
+        'destroy' => 'api.review.destroy'
+    ]);
     Route::get('/rooms/{room}/reviews', [ReviewController::class, 'getRoomReviews']);
 });

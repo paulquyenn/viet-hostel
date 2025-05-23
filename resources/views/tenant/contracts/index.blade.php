@@ -151,8 +151,8 @@
                                                         class="inline">
                                                         @csrf
                                                         <button type="submit" class="text-blue-600 hover:text-blue-900"
-                                                            onclick="return confirm('Bạn có chắc chắn muốn ký hợp đồng này?')">
-                                                            Ký hợp đồng
+                                                            onclick="return confirm('Bạn có chắc chắn muốn xác nhận hợp đồng này?')">
+                                                            Xác nhận hợp đồng
                                                         </button>
                                                     </form>
                                                 @endif
