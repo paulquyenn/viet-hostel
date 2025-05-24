@@ -60,7 +60,7 @@
                     <!-- Logo -->
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <h1 class="text-2xl font-bold gradient-text">TroViet</h1>
+                            <h1 class="text-2xl font-bold gradient-text">Trọ Việt</h1>
                         </div>
                     </div>
 
