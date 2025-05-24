@@ -334,8 +334,8 @@
                             </div>
                             <div class="text-sm font-medium text-gray-500">Trạng thái</div>
                             <div
-                                class="mt-1 text-xl font-bold {{ $room->status == 'Còn trống' ? 'text-green-600' : 'text-red-600' }}">
-                                {{ $room->status }}
+                                class="mt-1 text-xl font-bold {{ $room->status === 'available' ? 'text-green-600' : 'text-red-600' }}">
+                                {{ $room->status === 'available' ? 'Còn trống' : $room->status }}
                             </div>
                         </div>
                         <div

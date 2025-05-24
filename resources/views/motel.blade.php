@@ -325,8 +325,9 @@
                                     <span class="font-medium">{{ number_format($room->price) }} đ/tháng</span>
                                 </div>
                                 <div
-                                    class="absolute top-0 left-0 {{ $room->has_available_space ? 'bg-green-500' : 'bg-red-500' }} text-white px-2 py-1 m-2 rounded-md text-sm">
-                                    <span class="font-medium">{{ $room->status }}</span>
+                                    class="absolute top-0 left-0 {{ $room->status === 'available' ? 'bg-green-500' : 'bg-red-500' }} text-white px-2 py-1 m-2 rounded-md text-sm">
+                                    <span
+                                        class="font-medium">{{ $room->status === 'available' ? 'Còn trống' : $room->status }}</span>
                                 </div>
 
                                 <!-- Image counter badge -->
