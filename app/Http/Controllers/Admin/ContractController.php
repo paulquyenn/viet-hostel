@@ -29,34 +29,27 @@ class ContractController extends Controller
     /**
      * Hiển thị form tạo hợp đồng
      */
-    public function create(Request $request)
+    public function create(Booking $booking)
     {
-        $booking = null;
-        $room = null;
-        $tenant = null;
+        // Load các mối quan hệ cần thiết
+        $booking->load(['room.building.province', 'room.building.district', 'room.building.ward', 'user']);
+        $room = $booking->room;
+        $tenant = $booking->user;
 
-        // Nếu có booking_id, lấy thông tin từ booking
-        if ($request->has('booking') && $request->booking) {
-            $booking = Booking::with(['room.building', 'user'])->findOrFail($request->booking);
-            $room = $booking->room;
-            $tenant = $booking->user;
-        }
-
-        // Nếu có room_id, lấy thông tin phòng
-        if ($request->has('room') && $request->room) {
-            $room = Room::with('building')->findOrFail($request->room);
-        }
-
-        // Lấy danh sách phòng trống (nếu không chọn phòng từ booking)
+        // Lấy danh sách phòng trống để hiển thị tùy chọn khác
         $rooms = Room::where('status', 'available')->with('building')->get();
 
-        // Lấy danh sách người thuê tiềm năng (nếu không chọn người thuê từ booking)
+        // Lấy danh sách người thuê tiềm năng
         $tenants = User::role('tenant')->get();
 
         // Lấy danh sách chủ trọ
         $landlords = User::role('admin')->get();
 
-        return view('admin.contracts.create', compact('booking', 'room', 'tenant', 'rooms', 'tenants', 'landlords'));
+        // Chuẩn bị giá trị mặc định cho ngày bắt đầu và kết thúc hợp đồng
+        $startDate = $booking->desired_move_date ? $booking->desired_move_date->format('Y-m-d') : now()->format('Y-m-d');
+        $endDate = $booking->duration ? now()->addMonths($booking->duration)->format('Y-m-d') : now()->addYear()->format('Y-m-d');
+
+        return view('admin.contracts.create', compact('booking', 'room', 'tenant', 'rooms', 'tenants', 'landlords', 'startDate', 'endDate'));
     }
 
     /**
@@ -119,6 +112,7 @@ class ContractController extends Controller
         if ($validated['booking_id']) {
             $booking = Booking::find($validated['booking_id']);
             if ($booking && $booking->status === 'approved') {
+                // Đổi status sang 'completed' - giờ đã hợp lệ sau khi chạy migration
                 $booking->status = 'completed';
                 $booking->save();
             }
@@ -273,5 +267,43 @@ class ContractController extends Controller
 
         return redirect()->route('admin.contracts.index')
             ->with('success', 'Đã chấm dứt hợp đồng thành công.');
+    }
+
+    /**
+     * Download file hợp đồng
+     */
+    public function download(Contract $contract)
+    {
+        if (!$contract->file_path) {
+            return redirect()->back()->with('error', 'Không tìm thấy file hợp đồng.');
+        }
+
+        $path = Storage::disk('public')->path($contract->file_path);
+        $originalName = pathinfo($contract->file_path, PATHINFO_BASENAME);
+        $extension = pathinfo($contract->file_path, PATHINFO_EXTENSION);
+
+        // Use the original file extension rather than forcing PDF extension
+        $downloadName = $contract->contract_number . '.' . $extension;
+
+        // Add explicit mime type based on extension
+        $mimeTypes = [
+            'pdf' => 'application/pdf',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+
+        $mimeType = $mimeTypes[strtolower($extension)] ?? 'application/octet-stream';
+
+        // Check if file exists and is readable
+        if (!file_exists($path) || !is_readable($path)) {
+            return redirect()->back()->with('error', 'Không thể đọc file hợp đồng.');
+        }
+
+        // Use inline disposition for PDF files to view in browser
+        if (strtolower($extension) === 'pdf') {
+            return response()->file($path, ['Content-Type' => $mimeType]);
+        }
+
+        return response()->download($path, $downloadName, ['Content-Type' => $mimeType]);
     }
 }

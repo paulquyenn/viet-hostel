@@ -6,7 +6,7 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h2 class="card-title">Tạo hợp đồng</h2>
-                            <a href="{{ route('admin.bookings.show', $booking->id) }}"
+                            <a href="{{ route('admin.bookings.index') }}"
                                 class="btn btn-outline-secondary d-flex align-items-center">
                                 <i class="bi bi-arrow-left me-2"></i>
                                 Quay lại
@@ -79,6 +79,9 @@
                                         enctype="multipart/form-data" class="card card-body">
                                         @csrf
                                         <input type="hidden" name="booking_id" value="{{ $booking->id }}">
+                                        <input type="hidden" name="room_id" value="{{ $booking->room->id }}">
+                                        <input type="hidden" name="tenant_id" value="{{ $booking->user->id }}">
+                                        <input type="hidden" name="landlord_id" value="{{ auth()->id() }}">
 
                                         <div class="mb-4">
                                             <div class="row">
@@ -114,7 +117,7 @@
                                                     </label>
                                                     <input type="number" name="monthly_rent" id="monthly_rent"
                                                         class="form-control @error('monthly_rent') is-invalid @enderror"
-                                                        value="{{ $booking->room->price }}" required>
+                                                        value="{{ $booking->room->price ?? 0 }}" required>
                                                     @error('monthly_rent')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -138,11 +141,11 @@
                                                     Điều khoản và điều kiện <span class="text-danger">*</span>
                                                 </label>
                                                 <textarea name="terms_and_conditions" id="terms_and_conditions" rows="10"
-                                                    class="form-control @error('terms_and_conditions') is-invalid @enderror" required>1. Thời hạn thuê phòng: {{ $booking->duration }} tháng, từ ngày {{ date('d/m/Y', strtotime($startDate)) }} đến ngày {{ date('d/m/Y', strtotime($endDate)) }}
+                                                    class="form-control @error('terms_and_conditions') is-invalid @enderror" required>1. Thời hạn thuê phòng: {{ $booking->duration ?? 12 }} tháng, từ ngày {{ date('d/m/Y', strtotime($startDate)) }} đến ngày {{ date('d/m/Y', strtotime($endDate)) }}
 
-2. Giá thuê: {{ number_format($booking->room->price) }} VND/tháng, thanh toán vào ngày 05 hàng tháng
+2. Giá thuê: {{ number_format($booking->room->price ?? 0) }} VND/tháng, thanh toán vào ngày 05 hàng tháng
 
-3. Tiền đặt cọc: {{ number_format($booking->room->deposit) }} VND
+3. Tiền đặt cọc: {{ number_format($booking->room->deposit ?? 0) }} VND
 
 4. Điều kiện thanh toán: Tiền nhà được thanh toán đầy đủ vào đầu mỗi tháng không muộn hơn ngày 05
 

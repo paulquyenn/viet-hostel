@@ -99,6 +99,18 @@ class SideBar extends Component
                         'route' => 'admin.contracts.index',
                     ],
                 ]
+            ],
+            [
+                'key' => 'tenants',
+                'name' => 'Người thuê',
+                'route' => 'admin.tenants.index',
+                'icon' => 'bi bi-people',
+                'submenus' => [
+                    [
+                        'name' => 'Danh sách người thuê',
+                        'route' => 'admin.tenants.index',
+                    ],
+                ]
             ]
         ];
         return view('components.layouts.side-bar', [
