@@ -81,4 +81,48 @@ class User extends Authenticatable
     {
         return $this->hasMany(Contract::class, 'landlord_id');
     }
+
+    /**
+     * Kiểm tra xem người dùng có hợp đồng đang active không
+     */
+    public function hasActiveContract()
+    {
+        return $this->contracts()
+            ->whereIn('status', ['active', 'pending'])
+            ->where('end_date', '>', now())
+            ->exists();
+    }
+
+    /**
+     * Lấy hợp đồng active hiện tại (nếu có)
+     */
+    public function getActiveContract()
+    {
+        return $this->contracts()
+            ->whereIn('status', ['active', 'pending'])
+            ->where('end_date', '>', now())
+            ->with(['room.building'])
+            ->first();
+    }
+
+    /**
+     * Kiểm tra xem người dùng có đơn đặt phòng đang chờ xử lý không
+     */
+    public function hasPendingBooking()
+    {
+        return $this->bookings()
+            ->where('status', 'pending')
+            ->exists();
+    }
+
+    /**
+     * Lấy đơn đặt phòng đang chờ xử lý (nếu có)
+     */
+    public function getPendingBooking()
+    {
+        return $this->bookings()
+            ->where('status', 'pending')
+            ->with(['room.building'])
+            ->first();
+    }
 }

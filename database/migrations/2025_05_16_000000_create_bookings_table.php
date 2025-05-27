@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('desired_move_date');
             $table->integer('duration')->comment('Số tháng dự kiến thuê');
             $table->text('note')->nullable();
-            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled', 'completed'])->default('pending');
             $table->timestamps();
         });
     }

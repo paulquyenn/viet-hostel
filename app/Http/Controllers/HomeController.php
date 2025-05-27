@@ -31,6 +31,25 @@ class HomeController extends Controller
         // Load room with its relationships
         $room = $room->load(['building.province', 'building.district', 'building.ward', 'images', 'reviews.user']);
 
+        // Check if user has active contract or pending booking (show warning but allow viewing)
+        $hasActiveContract = false;
+        $hasPendingBooking = false;
+        $activeContract = null;
+        $pendingBooking = null;
+
+        if (auth()->check()) {
+            $hasActiveContract = auth()->user()->hasActiveContract();
+            $hasPendingBooking = auth()->user()->hasPendingBooking();
+
+            if ($hasActiveContract) {
+                $activeContract = auth()->user()->getActiveContract();
+            }
+
+            if ($hasPendingBooking) {
+                $pendingBooking = auth()->user()->getPendingBooking();
+            }
+        }
+
         // Get current tenants (users with active contracts)
         $currentTenants = $room->contracts()
             ->whereIn('status', ['active', 'approved'])
@@ -59,11 +78,21 @@ class HomeController extends Controller
             ->limit(3)
             ->get();
 
-        return view('motel-detail', [
+        $viewData = [
             'room' => $room,
             'similarRooms' => $similarRooms,
             'currentTenants' => $currentTenants,
-        ]);
+        ];
+
+        // Add user status variables only if user is authenticated
+        if (auth()->check()) {
+            $viewData['hasActiveContract'] = $hasActiveContract ?? false;
+            $viewData['hasPendingBooking'] = $hasPendingBooking ?? false;
+            $viewData['activeContract'] = $activeContract ?? null;
+            $viewData['pendingBooking'] = $pendingBooking ?? null;
+        }
+
+        return view('motel-detail', $viewData);
     }
 
     public function motel(Request $request)

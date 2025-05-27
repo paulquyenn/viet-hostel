@@ -1,4 +1,7 @@
 <x-tenant-layout>
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
     <div class="bg-gray-50 min-h-screen pb-12">
         <!-- Hero section with sticky header -->
         <div class="sticky top-0 z-30 bg-white shadow-md transition-all duration-300" x-data="{ isScrolled: false }"
@@ -262,7 +265,7 @@
                                 </div>
                                 <div id="contact" class="mt-4 flex flex-col space-y-2">
                                     @if ($room->has_available_space)
-                                        <a href="{{ route('tenant.bookings.create', $room->id) }}"
+                                        <a href="{{ route('tenant.bookings.create', $room->id) }}" id="book-room-btn"
                                             class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg transition duration-200 font-medium">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2"
                                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1058,11 +1061,254 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        /* Toast notification styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+            transform: translateX(100%);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-left: 4px solid #ff4757;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.hide {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .toast-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .toast-body {
+            font-size: 14px;
+            line-height: 1.5;
+            opacity: 0.95;
+        }
+
+        .toast-close {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .toast-close:hover {
+            opacity: 1;
+        }
+
+        /* Smooth animations */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .toast.entering {
+            animation: slideInRight 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .toast.leaving {
+            animation: slideOutRight 0.3s ease-in-out;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const shareButton = document.getElementById('shareButton');
+            // Toast notification system
+            function showToast(title, message, type = 'error') {
+                const toastContainer = document.getElementById('toast-container');
 
+                const toast = document.createElement('div');
+                toast.className = 'toast entering';
+
+                const iconSvg = type === 'error' ?
+                    `<svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>` :
+                    `<svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>`;
+
+                toast.innerHTML = `
+                    <button class="toast-close" onclick="closeToast(this)">&times;</button>
+                    <div class="toast-header">
+                        ${iconSvg}
+                        ${title}
+                    </div>
+                    <div class="toast-body">${message}</div>
+                `;
+
+                toastContainer.appendChild(toast);
+
+                // Trigger animation
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 10);
+
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    closeToast(toast.querySelector('.toast-close'));
+                }, 5000);
+            }
+
+            // Close toast function
+            window.closeToast = function(button) {
+                const toast = button.closest('.toast');
+                toast.classList.remove('show');
+                toast.classList.add('leaving');
+
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }
+
+            // Check booking status before allowing booking
+            const bookRoomBtn = document.getElementById('book-room-btn');
+            console.log('Book room button found:', bookRoomBtn);
+            if (bookRoomBtn) {
+                bookRoomBtn.addEventListener('click', function(e) {
+                    console.log('Book room button clicked');
+                    e.preventDefault(); // Prevent default navigation
+
+                    const originalHref = this.getAttribute('href');
+                    console.log('Original href:', originalHref);
+
+                    // Show loading state
+                    const originalText = this.innerHTML;
+                    this.innerHTML = `
+                        <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Đang kiểm tra...
+                    `;
+                    this.classList.add('opacity-75', 'cursor-not-allowed');
+
+                    // Make API call to check booking status
+                    console.log('Making API call to check booking status');
+                    fetch('/api/check-booking-status', {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content')
+                            },
+                            credentials: 'same-origin'
+                        })
+                        .then(response => {
+                            console.log('API response status:', response.status);
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('API response data:', data);
+                            // Restore button state
+                            this.innerHTML = originalText;
+                            this.classList.remove('opacity-75', 'cursor-not-allowed');
+
+                            if (data.status === 'available') {
+                                // User can book, proceed to booking page
+                                console.log('User can book, proceeding to booking page');
+                                window.location.href = originalHref;
+                            } else if (data.status === 'has_active_contract') {
+                                // Show toast for active contract
+                                console.log('User has active contract, showing toast');
+                                showToast(
+                                    'Không thể đặt phòng',
+                                    data.message,
+                                    'error'
+                                );
+                            } else if (data.status === 'has_pending_booking') {
+                                // Show toast for pending booking
+                                console.log('User has pending booking, showing toast');
+                                showToast(
+                                    'Đơn đặt phòng đang chờ xử lý',
+                                    data.message,
+                                    'error'
+                                );
+                            } else if (data.status === 'not_authenticated') {
+                                // Redirect to login
+                                console.log('User not authenticated, redirecting to login');
+                                showToast(
+                                    'Cần đăng nhập',
+                                    'Vui lòng đăng nhập để đặt phòng.',
+                                    'error'
+                                );
+                                setTimeout(() => {
+                                    window.location.href = '/login';
+                                }, 2000);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            // Restore button state
+                            this.innerHTML = originalText;
+                            this.classList.remove('opacity-75', 'cursor-not-allowed');
+
+                            showToast(
+                                'Lỗi hệ thống',
+                                'Có lỗi xảy ra khi kiểm tra trạng thái đặt phòng. Vui lòng thử lại.',
+                                'error'
+                            );
+                        });
+                });
+            }
+
+            // Existing share functionality
+            const shareButton = document.getElementById('shareButton');
             shareButton.addEventListener('click', function() {
                 // Get current URL
                 const currentUrl = window.location.href;

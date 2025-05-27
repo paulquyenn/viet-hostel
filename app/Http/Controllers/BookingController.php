@@ -26,6 +26,26 @@ class BookingController extends Controller
      */
     public function create(Room $room)
     {
+        // Kiểm tra xem người dùng đã có hợp đồng active hay chưa
+        if (Auth::user()->hasActiveContract()) {
+            $activeContract = Auth::user()->getActiveContract();
+            return redirect()->back()->with('error',
+                'Bạn đang có hợp đồng thuê phòng tại ' .
+                $activeContract->room->building->name . ' - ' . $activeContract->room->room_number .
+                ' (đến ngày ' . $activeContract->end_date->format('d/m/Y') . '). ' .
+                'Không thể đăng ký phòng mới khi đang có hợp đồng hiệu lực.');
+        }
+
+        // Kiểm tra xem người dùng có đơn đặt phòng đang chờ xử lý không
+        if (Auth::user()->hasPendingBooking()) {
+            $pendingBooking = Auth::user()->getPendingBooking();
+            return redirect()->back()->with('error',
+                'Bạn đang có đơn đặt phòng chờ xử lý tại ' .
+                $pendingBooking->room->building->name . ' - ' . $pendingBooking->room->room_number .
+                ' (ngày đặt: ' . $pendingBooking->created_at->format('d/m/Y') . '). ' .
+                'Vui lòng chờ xử lý hoặc hủy đơn cũ trước khi đặt phòng mới.');
+        }
+
         // Kiểm tra xem phòng có còn chỗ trống hay không
         if (!$room->has_available_space) {
             return redirect()->back()->with('error', 'Phòng này đã đầy, không thể đặt thêm.');
@@ -39,6 +59,26 @@ class BookingController extends Controller
      */
     public function store(Request $request, Room $room)
     {
+        // Kiểm tra xem người dùng đã có hợp đồng active hay chưa
+        if (Auth::user()->hasActiveContract()) {
+            $activeContract = Auth::user()->getActiveContract();
+            return redirect()->back()->with('error',
+                'Bạn đang có hợp đồng thuê phòng tại ' .
+                $activeContract->room->building->name . ' - ' . $activeContract->room->room_number .
+                ' (đến ngày ' . $activeContract->end_date->format('d/m/Y') . '). ' .
+                'Không thể đăng ký phòng mới khi đang có hợp đồng hiệu lực.');
+        }
+
+        // Kiểm tra xem người dùng có đơn đặt phòng đang chờ xử lý không
+        if (Auth::user()->hasPendingBooking()) {
+            $pendingBooking = Auth::user()->getPendingBooking();
+            return redirect()->back()->with('error',
+                'Bạn đang có đơn đặt phòng chờ xử lý tại ' .
+                $pendingBooking->room->building->name . ' - ' . $pendingBooking->room->room_number .
+                ' (ngày đặt: ' . $pendingBooking->created_at->format('d/m/Y') . '). ' .
+                'Vui lòng chờ xử lý hoặc hủy đơn cũ trước khi đặt phòng mới.');
+        }
+
         // Kiểm tra xem phòng có còn chỗ trống hay không
         if (!$room->has_available_space) {
             return redirect()->back()->with('error', 'Phòng này đã đầy, không thể đặt thêm.');
@@ -184,5 +224,43 @@ class BookingController extends Controller
 
         return redirect()->route('admin.bookings.index')
             ->with('success', 'Đã từ chối yêu cầu đặt phòng.');
+    }
+
+    public function checkStatus()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['status' => 'not_authenticated'], 401);
+        }
+
+        // Check for active contract
+        if ($user->hasActiveContract()) {
+            $contract = $user->getActiveContract();
+            $room = $contract->room;
+            $building = $room->building;
+            return response()->json([
+                'status' => 'has_active_contract',
+                'message' => "Bạn đang có hợp đồng thuê phòng tại {$building->name} - {$room->name} (đến ngày " . $contract->end_date->format('d/m/Y') . "). Không thể đăng ký phòng mới khi đang có hợp đồng hiệu lực.",
+                'room' => $room->name,
+                'building' => $building->name,
+                'end_date' => $contract->end_date->format('d/m/Y')
+            ]);
+        }
+
+        // Check for pending booking
+        if ($user->hasPendingBooking()) {
+            $booking = $user->getPendingBooking();
+            $room = $booking->room;
+            $building = $room->building;
+            return response()->json([
+                'status' => 'has_pending_booking',
+                'message' => "Bạn đang có đơn đặt phòng chờ xử lý tại {$building->name} - {$room->name}. Vui lòng chờ xử lý hoặc hủy đơn cũ trước khi đặt phòng mới.",
+                'room' => $room->name,
+                'building' => $building->name
+            ]);
+        }
+
+        return response()->json(['status' => 'available']);
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RoomImageController;
+use App\Http\Controllers\BookingController;
 use App\Models\District;
 
 // Districts API endpoint (không yêu cầu xác thực)
@@ -37,4 +38,5 @@ Route::middleware('auth')->prefix('api')->group(function () {
         'destroy' => 'api.review.destroy'
     ]);
     Route::get('/rooms/{room}/reviews', [ReviewController::class, 'getRoomReviews']);
+    Route::get('/check-booking-status', [BookingController::class, 'checkStatus']);
 });

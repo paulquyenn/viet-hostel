@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             ProviceSeeder::class,
             DistrictSeeder::class,
             WardSeeder::class,
+            BuildingSeeder::class,
         ]);
     }
 }
