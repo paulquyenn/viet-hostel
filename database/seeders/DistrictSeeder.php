@@ -14,27 +14,34 @@ class DistrictSeeder extends Seeder
      */
     public function run(): void
     {
+        // Get the Nghệ An province ID dynamically
+        $ngheAnProvince = DB::table('provinces')->where('name', 'Nghệ An')->first();
+
+        if (!$ngheAnProvince) {
+            throw new \Exception('Nghệ An province not found. Please run ProviceSeeder first.');
+        }
+
         $districts = [
-            ['name' => 'Thành phố Vinh', 'code' => null, 'province_id' => 1],
-            ['name' => 'Thị xã Hoàng Mai', 'code' => null, 'province_id' => 1],
-            ['name' => 'Thị xã Thái Hòa', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Diễn Châu', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Yên Thành', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Quỳnh Lưu', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Thanh Chương', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Nghi Lộc', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Đô Lương', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Nam Đàn', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Tân Kỳ', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Nghĩa Đàn', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Quỳ Hợp', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Hưng Nguyên', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Anh Sơn', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Kỳ Sơn', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Tương Dương', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Con Cuông', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Quế Phong', 'code' => null, 'province_id' => 1],
-            ['name' => 'Huyện Quỳ Châu', 'code' => null, 'province_id' => 1],
+            ['name' => 'Thành phố Vinh', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Thị xã Hoàng Mai', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Thị xã Thái Hòa', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Diễn Châu', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Yên Thành', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Quỳnh Lưu', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Thanh Chương', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Nghi Lộc', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Đô Lương', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Nam Đàn', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Tân Kỳ', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Nghĩa Đàn', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Quỳ Hợp', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Hưng Nguyên', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Anh Sơn', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Kỳ Sơn', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Tương Dương', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Con Cuông', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Quế Phong', 'code' => null, 'province_id' => $ngheAnProvince->id],
+            ['name' => 'Huyện Quỳ Châu', 'code' => null, 'province_id' => $ngheAnProvince->id],
         ];
 
         foreach ($districts as $district) {
