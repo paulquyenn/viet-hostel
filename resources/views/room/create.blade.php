@@ -9,7 +9,9 @@
 
                     <div class="card-body">
                         <x-room-image :route="route('image.store')" :name="'room_id'" :id="$room_id['id'] ?? null" />
-                        <form action="{{ route('room.store') }}" method="POST" enctype="multipart/form-data">
+                        <form
+                            action="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.rooms.store') }}"
+                            method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="image_ids" id="image_ids">
                             <script>
@@ -29,7 +31,9 @@
                                     });
 
                                     // Cập nhật input ẩn khi form được gửi
-                                    const form = document.querySelector('form[action="{{ route('room.store') }}"]');
+                                    const form = document.querySelector(
+                                        'form[action="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.rooms.store') }}"]'
+                                        );
                                     form.addEventListener('submit', function() {
                                         // Lấy giá trị từ input ẩn trong dropzone nếu có
                                         const dropzoneInput = document.getElementById('uploaded_image_ids');
@@ -144,7 +148,8 @@
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <a href="{{ route('room.index') }}" class="btn btn-secondary">Hủy</a>
+                                <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.rooms.index') }}"
+                                    class="btn btn-secondary">Hủy</a>
                                 <button type="submit" class="btn btn-primary">Lưu phòng</button>
                             </div>
                         </form>

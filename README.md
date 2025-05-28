@@ -340,6 +340,59 @@ tro-viet/
 
 ---
 
+## 🛣️ Cấu trúc Routes theo Vai trò
+
+Hệ thống routes đã được tổ chức lại theo vai trò để dễ quản lý và bảo mật:
+
+### **🔓 Public Routes**
+
+```http
+GET    /                         # Trang chủ
+GET    /about                    # Giới thiệu
+GET    /contact                  # Liên hệ
+```
+
+### **👤 Authenticated Routes (Tất cả user)**
+
+```http
+GET    /dashboard                # Dashboard chung
+GET    /profile                  # Quản lý profile
+GET    /motel                    # Xem danh sách phòng
+GET    /motel/{room}             # Chi tiết phòng
+GET    /my-reviews               # Đánh giá của tôi
+```
+
+### **🏠 Tenant Routes**
+
+```http
+GET    /tenant/bookings          # Danh sách booking
+POST   /tenant/bookings/{room}   # Tạo booking mới
+GET    /tenant/contracts         # Danh sách hợp đồng
+POST   /tenant/contracts/{id}/sign # Ký hợp đồng
+```
+
+### **🏢 Landlord Routes**
+
+```http
+GET    /landlord/buildings       # Quản lý tòa nhà
+GET    /landlord/rooms           # Quản lý phòng trọ
+GET    /landlord/bookings        # Xem booking
+GET    /landlord/tenants         # Danh sách người thuê
+```
+
+### **👑 Admin Routes**
+
+```http
+GET    /admin/users              # Quản lý user
+POST   /admin/bookings/{id}/approve # Duyệt booking
+GET    /admin/contracts/create   # Tạo hợp đồng
+GET    /admin/tenants/stats      # Thống kê
+```
+
+> 📋 **Chi tiết đầy đủ**: Xem file `ROUTES_DOCUMENTATION.md` để biết thêm chi tiết về từng route.
+
+---
+
 ## 📡 API Documentation
 
 ### **Authentication Endpoints**

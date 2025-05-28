@@ -104,7 +104,8 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm text-gray-500">
-                                                    {{ $review->created_at->format('d/m/Y H:i') }}</div>
+                                                    {{ $review->created_at ? $review->created_at->format('d/m/Y H:i') : 'N/A' }}
+                                                </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <a href="{{ route('review.show', $review->id) }}"

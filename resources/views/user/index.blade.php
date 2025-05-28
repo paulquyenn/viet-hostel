@@ -6,7 +6,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Danh sách người dùng</h3>
                         <div class="card-tools">
-                            <a href="{{ route('user.create') }}" class="btn btn-primary btn-sm">
+                            <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-sm">
                                 <i class="bi bi-plus-circle"></i> Thêm mới
                             </a>
                         </div>
@@ -33,10 +33,11 @@
                                         <td>{{ $item['roles']->count() > 0 ? $item['roles'][0]->name : 'Không có vai trò' }}
                                         </td>
                                         <td>
-                                            <a href="{{ route('user.edit', $item) }}" class="btn btn-sm btn-info">
+                                            <a href="{{ route('admin.users.edit', $item) }}"
+                                                class="btn btn-sm btn-info">
                                                 <i class="bi bi-pencil-fill"></i>
                                             </a>
-                                            <form action="{{ route('user.destroy', $item) }}" method="POST"
+                                            <form action="{{ route('admin.users.destroy', $item) }}" method="POST"
                                                 class="d-inline">
                                                 @csrf
                                                 @method('DELETE')

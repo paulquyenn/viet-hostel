@@ -63,7 +63,7 @@ class ReviewController extends Controller
 
         // Redirect based on user role
         if (Auth::user()->role === 'admin') {
-            return redirect()->route('room.show', $review->room_id)
+            return redirect()->route('motel.detail', $review->room_id)
                 ->with('success', 'Đánh giá của bạn đã được gửi thành công!');
         } else {
             return redirect()->route('motel.detail', $review->room_id)
@@ -115,7 +115,7 @@ class ReviewController extends Controller
 
         // Redirect based on user role
         if (Auth::user()->role === 'admin') {
-            return redirect()->route('room.show', $review->room_id)
+            return redirect()->route('motel.detail', $review->room_id)
                 ->with('success', 'Đánh giá đã được cập nhật thành công!');
         } else {
             return redirect()->route('motel.detail', $review->room_id)
@@ -138,7 +138,7 @@ class ReviewController extends Controller
 
         // Redirect based on user role
         if (Auth::user()->role === 'admin') {
-            return redirect()->route('room.show', $roomId)
+            return redirect()->route('motel.detail', $roomId)
                 ->with('success', 'Đánh giá đã được xóa thành công!');
         } else {
             return redirect()->route('motel.detail', $roomId)

@@ -44,7 +44,8 @@
                                     <div>
                                         <p class="text-sm font-medium text-gray-500">Ngày đặt</p>
                                         <p class="mt-1 text-sm text-gray-900">
-                                            {{ $booking->created_at->format('d/m/Y H:i') }}</p>
+                                            {{ $booking->created_at ? $booking->created_at->format('d/m/Y H:i') : 'N/A' }}
+                                        </p>
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium text-gray-500">Ngày dự kiến chuyển vào</p>

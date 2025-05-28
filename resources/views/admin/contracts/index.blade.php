@@ -52,7 +52,7 @@
                                                         {{ $contract->contract_number }}
                                                     </div>
                                                     <div class="text-muted small">
-                                                        {{ $contract->created_at->format('d/m/Y') }}
+                                                        {{ $contract->created_at ? $contract->created_at->format('d/m/Y') : 'N/A' }}
                                                     </div>
                                                 </td>
                                                 <td>

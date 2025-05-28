@@ -38,7 +38,8 @@
                         <div>
                             <h2 class="text-xl font-bold text-gray-800">Hợp đồng số: {{ $contract->contract_number }}
                             </h2>
-                            <p class="text-gray-600 mt-1">Ngày tạo: {{ $contract->created_at->format('d/m/Y') }}</p>
+                            <p class="text-gray-600 mt-1">Ngày tạo:
+                                {{ $contract->created_at ? $contract->created_at->format('d/m/Y') : 'N/A' }}</p>
                         </div>
                         <div class="mt-4 md:mt-0">
                             <div class="inline-flex items-center">

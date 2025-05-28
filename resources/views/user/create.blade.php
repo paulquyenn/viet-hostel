@@ -7,7 +7,7 @@
                         <h3 class="card-title">Thêm người dùng mới</h3>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ route('user.store') }}">
+                        <form method="POST" action="{{ route('admin.users.store') }}">
                             @csrf
 
                             <div class="mb-3">
@@ -88,7 +88,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <a href="{{ route('user.index') }}" class="btn btn-secondary">
+                                <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
                                     <i class="bi bi-arrow-left"></i> Quay lại
                                 </a>
                                 <button type="submit" class="btn btn-primary">

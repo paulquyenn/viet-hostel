@@ -10,7 +10,9 @@
                     <div class="card-body">
                         <x-room-image :route="route('image.store')" :name="'room_id'" :id="$room['id']" :imgs="$room['images']" />
 
-                        <form action="{{ route('room.update', $room) }}" method="POST" enctype="multipart/form-data">
+                        <form
+                            action="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.rooms.update', $room) }}"
+                            method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <input type="hidden" name="new_image_ids" id="new_image_ids">
@@ -128,7 +130,8 @@
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <a href="{{ route('room.index') }}" class="btn btn-secondary">Hủy</a>
+                                <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.rooms.index') }}"
+                                    class="btn btn-secondary">Hủy</a>
                                 <button type="submit" class="btn btn-primary">Cập nhật</button>
                             </div>
                         </form>

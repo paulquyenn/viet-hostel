@@ -6,7 +6,8 @@
                     <div class="card-header">
                         <h3 class="card-title">Danh sách phòng</h3>
                         <div class="card-tools">
-                            <a href="{{ route('room.create') }}" class="btn btn-primary btn-sm">
+                            <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.rooms.create') }}"
+                                class="btn btn-primary btn-sm">
                                 <i class="bi bi-plus-circle"></i> Thêm phòng mới
                             </a>
                         </div>
@@ -62,22 +63,25 @@
                                             </td>
                                             <td>{{ $room->max_person }}</td>
                                             <td>
-                                                <a href="{{ route('room.show', $room) }}" class="btn btn-sm btn-info">
+                                                <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.rooms.show', $room) }}"
+                                                    class="btn btn-sm btn-info">
                                                     <i class="bi bi-eye-fill"></i>
                                                 </a>
-                                                <a href="{{ route('room.edit', $room) }}"
+                                                <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.rooms.edit', $room) }}"
                                                     class="btn btn-sm btn-warning">
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </a>
-                                                <form action="{{ route('room.destroy', $room) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger"
-                                                        onclick="return confirm('Bạn có chắc muốn xóa phòng này?')">
-                                                        <i class="bi bi-trash-fill"></i>
-                                                    </button>
-                                                </form>
+                                                @if (auth()->user()->hasRole('admin'))
+                                                    <form action="{{ route('admin.rooms.destroy', $room) }}"
+                                                        method="POST" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger"
+                                                            onclick="return confirm('Bạn có chắc muốn xóa phòng này?')">
+                                                            <i class="bi bi-trash-fill"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty

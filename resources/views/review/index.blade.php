@@ -34,7 +34,7 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>
-                                                    <a href="{{ route('room.show', $review->room_id) }}">
+                                                    <a href="{{ route('motel.detail', $review->room_id) }}">
                                                         {{ $review->room->room_number }}
                                                     </a>
                                                 </td>
@@ -51,7 +51,8 @@
                                                     ({{ $review->rating }}/5)
                                                 </td>
                                                 <td>{{ \Illuminate\Support\Str::limit($review->comment, 50) }}</td>
-                                                <td>{{ $review->created_at->format('d/m/Y H:i') }}</td>
+                                                <td>{{ $review->created_at ? $review->created_at->format('d/m/Y H:i') : 'N/A' }}
+                                                </td>
                                                 <td>
                                                     <div class="btn-group">
                                                         <a href="{{ route('review.show', $review->id) }}"

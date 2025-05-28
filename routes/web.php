@@ -13,6 +13,12 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Public Routes - Không yêu cầu đăng nhập
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/', function () {
     if (!Auth::check()) {
         return view('welcome');
@@ -20,64 +26,151 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
+// Các trang công khai
 Route::controller(HomeController::class)->group(function () {
-    Route::get('/motel', 'motel')->name('motel')->middleware('auth');
-    Route::get('/motel/{room}', 'motelDetail')->name('motel.detail')->middleware('auth');
-    Route::get('/my-reviews', 'myReviews')->name('my.reviews')->middleware('auth');
     Route::get('/about', 'about')->name('about');
     Route::get('/contact', 'contact')->name('contact');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::resource('user', UserController::class)->only('index', 'create', 'edit', 'show');
-    Route::resource('building', BuildingController::class)->only('index', 'create', 'edit', 'show');
-    Route::resource('room', RoomController::class)->only('index', 'create', 'edit', 'show');
-    Route::resource('image', ImageController::class)->only('index', 'create', 'edit', 'show');
-    Route::resource('room_image', RoomImageController::class)->only('index', 'create', 'edit', 'show');
-    Route::resource('review', ReviewController::class);
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes - Yêu cầu đăng nhập
+|--------------------------------------------------------------------------
+*/
 
-    Route::prefix('tenant')->name('tenant.')->group(function () {
-        Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
-        Route::get('/bookings/create/{room}', [BookingController::class, 'create'])->name('bookings.create');
-        Route::post('/bookings/{room}', [BookingController::class, 'store'])->name('bookings.store');
-        Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
-        Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+Route::middleware(['auth', 'verified'])->group(function () {
 
-        Route::get('/contracts', [ContractController::class, 'index'])->name('contracts.index');
-        Route::get('/contracts/{contract}', [ContractController::class, 'show'])->name('contracts.show');
-        Route::get('/contracts/{contract}/download', [ContractController::class, 'download'])->name('contracts.download');
-        Route::post('/contracts/{contract}/sign', [ContractController::class, 'sign'])->name('contracts.sign');
+    // Dashboard
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    // Profile routes - Tất cả user đã đăng nhập
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+        Route::patch('/', [ProfileController::class, 'update'])->name('update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     });
 
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/bookings', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings.index');
-        Route::get('/bookings/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'show'])->name('bookings.show');
-        Route::post('/bookings/{booking}/approve', [\App\Http\Controllers\Admin\BookingController::class, 'approve'])->name('bookings.approve');
-        Route::post('/bookings/{booking}/reject', [\App\Http\Controllers\Admin\BookingController::class, 'reject'])->name('bookings.reject');
+    // Shared routes - Tất cả user đã đăng nhập có thể truy cập
+    Route::controller(HomeController::class)->group(function () {
+        Route::get('/motel', 'motel')->name('motel');
+        Route::get('/motel/{room}', 'motelDetail')->name('motel.detail');
+        Route::get('/my-reviews', 'myReviews')->name('my.reviews');
+    });
 
-        Route::get('/contracts', [\App\Http\Controllers\Admin\ContractController::class, 'index'])->name('contracts.index');
-        Route::get('/contracts/create/{booking}', [\App\Http\Controllers\Admin\ContractController::class, 'create'])->name('contracts.create');
-        Route::post('/contracts', [\App\Http\Controllers\Admin\ContractController::class, 'store'])->name('contracts.store');
-        Route::get('/contracts/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'show'])->name('contracts.show');
-        Route::get('/contracts/{contract}/download', [\App\Http\Controllers\Admin\ContractController::class, 'download'])->name('contracts.download');
-        Route::get('/contracts/{contract}/edit', [\App\Http\Controllers\Admin\ContractController::class, 'edit'])->name('contracts.edit');
-        Route::put('/contracts/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'update'])->name('contracts.update');
-        Route::post('/contracts/{contract}/sign', [\App\Http\Controllers\Admin\ContractController::class, 'sign'])->name('contracts.sign');
-        Route::post('/contracts/{contract}/terminate', [\App\Http\Controllers\Admin\ContractController::class, 'terminate'])->name('contracts.terminate');
+    // Review routes - Tất cả user có thể tạo và quản lý review
+    Route::resource('review', ReviewController::class);
 
-        Route::get('/tenants', [\App\Http\Controllers\Admin\TenantController::class, 'index'])->name('tenants.index');
-        Route::get('/tenants/{tenant}', [\App\Http\Controllers\Admin\TenantController::class, 'show'])->name('tenants.show');
-        Route::get('/tenants-stats', [\App\Http\Controllers\Admin\TenantController::class, 'stats'])->name('tenants.stats');
+    /*
+    |--------------------------------------------------------------------------
+    | Tenant Routes - Dành cho người thuê trọ
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:tenant')->prefix('tenant')->name('tenant.')->group(function () {
+
+        // Booking management
+        Route::prefix('bookings')->name('bookings.')->group(function () {
+            Route::get('/', [BookingController::class, 'index'])->name('index');
+            Route::get('/create/{room}', [BookingController::class, 'create'])->name('create');
+            Route::post('/{room}', [BookingController::class, 'store'])->name('store');
+            Route::get('/{booking}', [BookingController::class, 'show'])->name('show');
+            Route::post('/{booking}/cancel', [BookingController::class, 'cancel'])->name('cancel');
+        });
+
+        // Contract management for tenants
+        Route::prefix('contracts')->name('contracts.')->group(function () {
+            Route::get('/', [ContractController::class, 'index'])->name('index');
+            Route::get('/{contract}', [ContractController::class, 'show'])->name('show');
+            Route::get('/{contract}/download', [ContractController::class, 'download'])->name('download');
+            Route::post('/{contract}/sign', [ContractController::class, 'sign'])->name('sign');
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Landlord Routes - Dành cho chủ trọ
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:landlord')->prefix('landlord')->name('landlord.')->group(function () {
+
+        // Building management
+        Route::resource('buildings', BuildingController::class)->except(['destroy']);
+
+        // Room management
+        Route::resource('rooms', RoomController::class)->except(['destroy']);
+
+        // Image management
+        Route::resource('images', ImageController::class)->except(['destroy']);
+        Route::resource('room_image', RoomImageController::class)->except(['destroy']);
+
+        // View bookings related to landlord's properties
+        Route::prefix('bookings')->name('bookings.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('index');
+            Route::get('/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'show'])->name('show');
+        });
+
+        // View contracts related to landlord's properties
+        Route::prefix('contracts')->name('contracts.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\ContractController::class, 'index'])->name('index');
+            Route::get('/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'show'])->name('show');
+            Route::get('/{contract}/download', [\App\Http\Controllers\Admin\ContractController::class, 'download'])->name('download');
+        });
+
+        // View tenants in landlord's properties
+        Route::prefix('tenants')->name('tenants.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\TenantController::class, 'index'])->name('index');
+            Route::get('/{tenant}', [\App\Http\Controllers\Admin\TenantController::class, 'show'])->name('show');
+        });
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Routes - Dành cho quản trị viên
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+
+        // User management
+        Route::resource('users', UserController::class);
+
+        // Building management (full control)
+        Route::resource('buildings', BuildingController::class);
+
+        // Room management (full control)
+        Route::resource('rooms', RoomController::class);
+
+        // Image management (full control)
+        Route::resource('images', ImageController::class);
+        Route::resource('room_image', RoomImageController::class);
+
+        // Booking management
+        Route::prefix('bookings')->name('bookings.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('index');
+            Route::get('/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'show'])->name('show');
+            Route::post('/{booking}/approve', [\App\Http\Controllers\Admin\BookingController::class, 'approve'])->name('approve');
+            Route::post('/{booking}/reject', [\App\Http\Controllers\Admin\BookingController::class, 'reject'])->name('reject');
+        });
+
+        // Contract management
+        Route::prefix('contracts')->name('contracts.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\ContractController::class, 'index'])->name('index');
+            Route::get('/create/{booking}', [\App\Http\Controllers\Admin\ContractController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\ContractController::class, 'store'])->name('store');
+            Route::get('/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'show'])->name('show');
+            Route::get('/{contract}/download', [\App\Http\Controllers\Admin\ContractController::class, 'download'])->name('download');
+            Route::get('/{contract}/edit', [\App\Http\Controllers\Admin\ContractController::class, 'edit'])->name('edit');
+            Route::put('/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'update'])->name('update');
+            Route::post('/{contract}/sign', [\App\Http\Controllers\Admin\ContractController::class, 'sign'])->name('sign');
+            Route::post('/{contract}/terminate', [\App\Http\Controllers\Admin\ContractController::class, 'terminate'])->name('terminate');
+        });
+
+        // Tenant management
+        Route::prefix('tenants')->name('tenants.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\TenantController::class, 'index'])->name('index');
+            Route::get('/{tenant}', [\App\Http\Controllers\Admin\TenantController::class, 'show'])->name('show');
+            Route::get('/stats', [\App\Http\Controllers\Admin\TenantController::class, 'stats'])->name('stats');
+        });
     });
 });
 

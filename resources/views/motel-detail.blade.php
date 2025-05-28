@@ -233,7 +233,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    Ngày đăng: {{ $room->created_at->format('d/m/Y') }}
+                                    Ngày đăng: {{ $room->created_at ? $room->created_at->format('d/m/Y') : 'N/A' }}
                                 </div>
                                 <div
                                     class="inline-flex items-center bg-gray-100 rounded-full px-3 py-1 text-sm text-gray-700">
@@ -729,7 +729,7 @@
                                                             @endif
                                                         @endfor
                                                         <span
-                                                            class="ml-2 text-sm text-gray-500">{{ $review->created_at->format('d/m/Y') }}</span>
+                                                            class="ml-2 text-sm text-gray-500">{{ $review->created_at ? $review->created_at->format('d/m/Y') : 'N/A' }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -826,7 +826,7 @@
                                                                     @endif
                                                                 @endfor
                                                                 <span
-                                                                    class="ml-2 text-sm text-gray-500">{{ $review->created_at->format('d/m/Y') }}</span>
+                                                                    class="ml-2 text-sm text-gray-500">{{ $review->created_at ? $review->created_at->format('d/m/Y') : 'N/A' }}</span>
                                                             </div>
                                                         </div>
                                                     </div>

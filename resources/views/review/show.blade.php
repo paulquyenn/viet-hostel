@@ -16,7 +16,7 @@
                         <div class="row mb-4">
                             <div class="col-md-4 font-weight-bold">{{ __('Phòng:') }}</div>
                             <div class="col-md-8">
-                                <a href="{{ route('room.show', $review->room_id) }}">
+                                <a href="{{ route('motel.detail', $review->room_id) }}">
                                     {{ $review->room->room_number }}
                                     @if ($review->room->building)
                                         - {{ $review->room->building->name }}
@@ -57,12 +57,14 @@
 
                         <div class="row mb-4">
                             <div class="col-md-4 font-weight-bold">{{ __('Ngày đánh giá:') }}</div>
-                            <div class="col-md-8">{{ $review->created_at->format('d/m/Y H:i') }}</div>
+                            <div class="col-md-8">
+                                {{ $review->created_at ? $review->created_at->format('d/m/Y H:i') : 'N/A' }}</div>
                         </div>
 
                         <div class="row mb-4">
                             <div class="col-md-4 font-weight-bold">{{ __('Cập nhật lần cuối:') }}</div>
-                            <div class="col-md-8">{{ $review->updated_at->format('d/m/Y H:i') }}</div>
+                            <div class="col-md-8">
+                                {{ $review->updated_at ? $review->updated_at->format('d/m/Y H:i') : 'N/A' }}</div>
                         </div>
 
                         @if (auth()->id() === $review->user_id || auth()->user()->hasRole('admin'))

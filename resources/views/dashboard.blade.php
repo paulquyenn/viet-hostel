@@ -397,7 +397,7 @@
                                             <td>{{ $building->full_address }}</td>
                                             <td>{{ $building->rooms->count() }}</td>
                                             <td>
-                                                <a href="{{ route('building.show', $building) }}"
+                                                <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.buildings.show', $building) }}"
                                                     class="btn btn-sm btn-primary">Xem</a>
                                             </td>
                                         </tr>

@@ -50,8 +50,8 @@
                                 <span class="ml-2 text-lg font-medium">{{ $review->rating }}/5</span>
                             </div>
                             <div class="text-gray-500">
-                                <time datetime="{{ $review->created_at->format('Y-m-d') }}">
-                                    {{ $review->created_at->format('d/m/Y') }}
+                                <time datetime="{{ $review->created_at ? $review->created_at->format('Y-m-d') : '' }}">
+                                    {{ $review->created_at ? $review->created_at->format('d/m/Y') : 'N/A' }}
                                 </time>
                             </div>
                         </div>

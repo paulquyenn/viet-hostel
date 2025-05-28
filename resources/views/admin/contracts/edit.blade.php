@@ -45,7 +45,9 @@
                                             </div>
                                             <div class="col-sm-12 mb-3">
                                                 <dt class="text-muted small">Ngày tạo</dt>
-                                                <dd class="mb-0">{{ $contract->created_at->format('d/m/Y H:i') }}</dd>
+                                                <dd class="mb-0">
+                                                    {{ $contract->created_at ? $contract->created_at->format('d/m/Y H:i') : 'N/A' }}
+                                                </dd>
                                             </div>
                                             <div class="col-sm-12 mb-3">
                                                 <dt class="text-muted small">Trạng thái</dt>

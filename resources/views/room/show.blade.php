@@ -6,10 +6,12 @@
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Chi tiết phòng {{ $room->room_number }}</h5>
                         <div>
-                            <a href="{{ route('room.edit', $room) }}" class="btn btn-warning">
+                            <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.rooms.edit', $room) }}"
+                                class="btn btn-warning">
                                 <i class="bi bi-pencil"></i> Sửa
                             </a>
-                            <a href="{{ route('room.index') }}" class="btn btn-secondary">
+                            <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.rooms.index') }}"
+                                class="btn btn-secondary">
                                 <i class="bi bi-arrow-left"></i> Quay lại
                             </a>
                         </div>
@@ -124,11 +126,13 @@
                                     </tr>
                                     <tr>
                                         <th>Ngày tạo</th>
-                                        <td>{{ $room->created_at->format('d/m/Y H:i') }}</td>
+                                        <td>{{ $room->created_at ? $room->created_at->format('d/m/Y H:i') : 'N/A' }}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th>Cập nhật lần cuối</th>
-                                        <td>{{ $room->updated_at->format('d/m/Y H:i') }}</td>
+                                        <td>{{ $room->updated_at ? $room->updated_at->format('d/m/Y H:i') : 'N/A' }}
+                                        </td>
                                     </tr>
                                 </table>
                             </div>
@@ -193,7 +197,7 @@
                                                             @endfor
                                                         </div>
                                                         <small
-                                                            class="text-muted">{{ $review->created_at->format('d/m/Y') }}</small>
+                                                            class="text-muted">{{ $review->created_at ? $review->created_at->format('d/m/Y') : 'N/A' }}</small>
                                                     </div>
 
                                                     @if (auth()->id() === $review->user_id || auth()->user()->hasRole('admin'))

@@ -6,7 +6,8 @@
                     <div class="card-header">
                         <h3 class="card-title">Danh sách tòa nhà</h3>
                         <div class="card-tools">
-                            <a href="{{ route('building.create') }}" class="btn btn-primary btn-sm">
+                            <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.buildings.create') }}"
+                                class="btn btn-primary btn-sm">
                                 <i class="bi bi-plus-circle"></i> Thêm mới
                             </a>
                         </div>
@@ -28,21 +29,28 @@
                                         <td>{{ $building->id }}</td>
                                         <td>{{ $building->name }}</td>
                                         <td>{{ $building->full_address }}</td>
-                                        <td>{{ $building->created_at->format('d/m/Y') }}</td>
+                                        <td>{{ $building->created_at ? $building->created_at->format('d/m/Y') : 'N/A' }}
+                                        </td>
                                         <td>
-                                            <a href="{{ route('building.edit', $building) }}"
+                                            <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.buildings.show', $building) }}"
+                                                class="btn btn-sm btn-secondary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.buildings.edit', $building) }}"
                                                 class="btn btn-sm btn-info">
                                                 <i class="bi bi-pencil-fill"></i>
                                             </a>
-                                            <form action="{{ route('building.destroy', $building) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger"
-                                                    onclick="return confirm('Bạn có chắc chắn muốn xóa tòa nhà này?')">
-                                                    <i class="bi bi-trash-fill"></i>
-                                                </button>
-                                            </form>
+                                            @if (auth()->user()->hasRole('admin'))
+                                                <form action="{{ route('admin.buildings.destroy', $building) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger"
+                                                        onclick="return confirm('Bạn có chắc chắn muốn xóa tòa nhà này?')">
+                                                        <i class="bi bi-trash-fill"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty

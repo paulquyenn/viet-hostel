@@ -134,12 +134,12 @@
                 </a>
                 <ul id="building-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
-                        <a href="{{ route('building.index') }}">
+                        <a href="{{ route('landlord.buildings.index') }}">
                             <i class="bi bi-circle"></i><span>Danh sách nhà trọ</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('building.create') }}">
+                        <a href="{{ route('landlord.buildings.create') }}">
                             <i class="bi bi-circle"></i><span>Thêm nhà trọ</span>
                         </a>
                     </li>
@@ -153,12 +153,12 @@
                 </a>
                 <ul id="rooms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
-                        <a href="{{ route('room.index') }}">
+                        <a href="{{ route('landlord.rooms.index') }}">
                             <i class="bi bi-circle"></i><span>Danh sách phòng</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('room.create') }}">
+                        <a href="{{ route('landlord.rooms.create') }}">
                             <i class="bi bi-circle"></i><span>Thêm phòng</span>
                         </a>
                     </li>

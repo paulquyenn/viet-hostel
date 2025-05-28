@@ -7,7 +7,8 @@
                         <h3 class="card-title">Cập nhật thông tin tòa nhà</h3>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ route('building.update', $building->id) }}">
+                        <form method="POST"
+                            action="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.buildings.update', $building->id) }}">
                             @csrf
                             @method('PUT')
 
@@ -88,7 +89,8 @@
                                 @enderror
                             </div>
                             <div class="d-flex justify-content-between">
-                                <a href="{{ route('building.index') }}" class="btn btn-secondary">
+                                <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.buildings.index') }}"
+                                    class="btn btn-secondary">
                                     <i class="bi bi-arrow-left"></i> Quay lại
                                 </a>
                                 <button type="submit" class="btn btn-success">

@@ -37,7 +37,8 @@
                         class="bg-light rounded-top p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center border-bottom mb-4">
                         <div>
                             <h2 class="h4 fw-bold">Hợp đồng số: {{ $contract->contract_number }}</h2>
-                            <p class="text-muted mb-0">Ngày tạo: {{ $contract->created_at->format('d/m/Y H:i') }}</p>
+                            <p class="text-muted mb-0">Ngày tạo:
+                                {{ $contract->created_at ? $contract->created_at->format('d/m/Y H:i') : 'N/A' }}</p>
                         </div>
                         <div class="mt-3 mt-md-0">
                             <div class="d-flex align-items-center">

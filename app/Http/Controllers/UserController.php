@@ -50,7 +50,7 @@ class UserController extends Controller
         $user = User::create($data);
         $user->assignRole($data['role']);
 
-        return redirect()->route('user.index')->with('success', 'người dùng được tạo thành công.');
+        return redirect()->route('admin.users.index')->with('success', 'người dùng được tạo thành công.');
     }
 
     /**
@@ -88,7 +88,7 @@ class UserController extends Controller
 
         $user->update($data);
         $user->syncRoles($data['role']);
-        return redirect()->route('user.index');
+        return redirect()->route('admin.users.index');
     }
 
     /**
@@ -99,10 +99,10 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if ($user->hasRole('admin')) {
-            return redirect()->route('user.index')->with('error', 'Không thể xóa tài khoản admin.');
+            return redirect()->route('admin.users.index')->with('error', 'Không thể xóa tài khoản admin.');
         }
 
         $user->delete();
-        return redirect()->route('user.index')->with('success', 'Người dùng đã được xóa thành công.');
+        return redirect()->route('admin.users.index')->with('success', 'Người dùng đã được xóa thành công.');
     }
 }

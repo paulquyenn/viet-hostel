@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Support\Facades\Auth;
 
 class RoomController extends Controller
 {
@@ -98,7 +99,7 @@ class RoomController extends Controller
             \Log::info('Không có ID ảnh để xử lý');
         }
 
-        return redirect()->route('room.index')->with('success', 'Phòng đã được tạo thành công.');
+        return redirect()->route($this->getRoutePrefix() . 'rooms.index')->with('success', 'Phòng đã được tạo thành công.');
     }
 
     /**
@@ -189,7 +190,7 @@ class RoomController extends Controller
             }
         }
 
-        return redirect()->route('room.index')->with('success', 'Phòng đã được cập nhật thành công.');
+        return redirect()->route($this->getRoutePrefix() . 'rooms.index')->with('success', 'Phòng đã được cập nhật thành công.');
     }
 
     /**
@@ -200,6 +201,20 @@ class RoomController extends Controller
         $room = Room::findOrFail($id);
 
         $room->delete();
-        return redirect()->route('room.index');
+        return redirect()->route($this->getRoutePrefix() . 'rooms.index');
+    }
+
+    /**
+     * Determine the route prefix based on user role
+     */
+    private function getRoutePrefix(): string
+    {
+        $user = Auth::user();
+        if ($user && $user->hasRole('admin')) {
+            return 'admin.';
+        } elseif ($user && $user->hasRole('landlord')) {
+            return 'landlord.';
+        }
+        return '';
     }
 }

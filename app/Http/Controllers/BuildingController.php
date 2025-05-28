@@ -64,15 +64,16 @@ class BuildingController extends Controller
         }
 
         Building::create($data);
-        return redirect()->route('building.index');
+        return redirect()->route($this->getRoutePrefix() . 'buildings.index');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Building $building)
     {
-        //
+        $building->load(['rooms', 'ward', 'district', 'province']);
+        return view('building.show', compact('building'));
     }
 
     /**
@@ -95,10 +96,8 @@ class BuildingController extends Controller
      */
     public function update(UpdateBuildingRequest $request, Building $building)
     {
-        $data = $request->all();
-        $building->update($data);
-
-        return redirect()->route('building.index');
+        $data = $request->all();        $building->update($data);
+        return redirect()->route($this->getRoutePrefix() . 'buildings.index');
     }
 
     /**
@@ -108,9 +107,23 @@ class BuildingController extends Controller
     {
         try {
             $building->delete();
-            return redirect()->route('building.index');
+            return redirect()->route($this->getRoutePrefix() . 'buildings.index');
         } catch (\Exception $e) {
-            return redirect()->route('building.index');
+            return redirect()->route($this->getRoutePrefix() . 'buildings.index');
         }
+    }
+
+    /**
+     * Determine the route prefix based on user role
+     */
+    private function getRoutePrefix(): string
+    {
+        $user = Auth::user();
+        if ($user && $user->hasRole('admin')) {
+            return 'admin.';
+        } elseif ($user && $user->hasRole('landlord')) {
+            return 'landlord.';
+        }
+        return '';
     }
 }

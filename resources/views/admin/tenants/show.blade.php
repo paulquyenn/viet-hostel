@@ -72,7 +72,7 @@
                                                 <label class="form-label text-muted">Ngày tham gia:</label>
                                                 <div class="fw-semibold">
                                                     <i class="bi bi-calendar text-primary"></i>
-                                                    {{ $tenant->created_at->format('d/m/Y H:i') }}
+                                                    {{ $tenant->created_at ? $tenant->created_at->format('d/m/Y H:i') : 'N/A' }}
                                                 </div>
                                             </div>
                                         </div>
@@ -219,7 +219,7 @@
                                                                     @endif
                                                                 </td>
                                                                 <td>
-                                                                    {{ $contract->created_at->format('d/m/Y H:i') }}
+                                                                    {{ $contract->created_at ? $contract->created_at->format('d/m/Y H:i') : 'N/A' }}
                                                                 </td>
                                                                 <td class="text-end">
                                                                     <a href="{{ route('admin.contracts.show', $contract->id) }}"
@@ -297,7 +297,7 @@
                                                                     @endif
                                                                 </td>
                                                                 <td>
-                                                                    {{ $booking->created_at->format('d/m/Y H:i') }}
+                                                                    {{ $booking->created_at ? $booking->created_at->format('d/m/Y H:i') : 'N/A' }}
                                                                 </td>
                                                                 <td class="text-end">
                                                                     <a href="{{ route('admin.bookings.show', $booking->id) }}"
