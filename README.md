@@ -1,202 +1,595 @@
-<p align="center"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></p>
+# TRO-VIET - Hệ thống quản lý nhà trọ thông minh
 
-# TRO-VIET - Ứng dụng quản lý nhà trọ
+<p align="center">
+  <img src="https://via.placeholder.com/400x100/4154f1/ffffff?text=TRO+VIET" width="400" alt="TRO-VIET Logo">
+</p>
 
-## Giới thiệu
+<p align="center">
+  <strong>Nền tảng kết nối không gian sống lý tưởng</strong><br>
+  Hệ thống quản lý nhà trọ toàn diện với giao diện hiện đại và tính năng đa dạng
+</p>
 
-TRO-VIET là ứng dụng quản lý nhà trọ được phát triển trên nền tảng Laravel, giúp người dùng dễ dàng quản lý các tòa nhà, phòng trọ và thông tin khách thuê. Ứng dụng hỗ trợ phân cấp địa lý theo tỉnh/thành phố, quận/huyện, và phường/xã, đồng thời cung cấp hệ thống đặt phòng, quản lý hợp đồng và đánh giá phòng trọ.
+<p align="center">
+  <img src="https://img.shields.io/badge/Laravel-12.0-ff2d20?style=for-the-badge&logo=laravel" alt="Laravel">
+  <img src="https://img.shields.io/badge/PHP-8.2+-777bb4?style=for-the-badge&logo=php" alt="PHP">
+  <img src="https://img.shields.io/badge/TailwindCSS-3.4-06b6d4?style=for-the-badge&logo=tailwindcss" alt="TailwindCSS">
+  <img src="https://img.shields.io/badge/Alpine.js-3.14-8bc34a?style=for-the-badge&logo=alpine.js" alt="Alpine.js">
+  <img src="https://img.shields.io/badge/Vite-6.2-646cff?style=for-the-badge&logo=vite" alt="Vite">
+</p>
 
-## Tính năng chính
+---
 
--   Quản lý tòa nhà và phòng trọ
--   Theo dõi tình trạng phòng (còn trống/đã thuê)
--   Quản lý thông tin phòng (diện tích, giá cả, đặt cọc, tiện ích, số người ở tối đa)
--   Quản lý hình ảnh phòng trọ (hỗ trợ tải lên nhiều hình ảnh)
--   Hệ thống đặt phòng trực tuyến
--   Quản lý hợp đồng thuê phòng (với chữ ký điện tử)
--   Hệ thống đánh giá và nhận xét về phòng trọ
--   Phân cấp địa lý (tỉnh/thành, quận/huyện, phường/xã)
--   Quản lý người dùng và phân quyền (sử dụng Spatie Permission)
+## 📖 Giới thiệu
 
-## Mô hình dữ liệu
+**TRO-VIET** là một hệ thống quản lý nhà trọ thông minh được phát triển trên nền tảng Laravel framework. Ứng dụng cung cấp giải pháp toàn diện cho việc quản lý tòa nhà, phòng trọ, khách thuê và các hoạt động kinh doanh cho thuê phòng trọ.
 
-### Tòa nhà (Building)
+### 🎯 Mục tiêu
 
--   Tên tòa nhà
--   Địa chỉ
--   Thông tin vị trí (phường/xã, quận/huyện, tỉnh/thành)
--   Chủ sở hữu (người dùng)
+-   Số hóa quy trình quản lý nhà trọ
+-   Tạo nền tảng kết nối chủ trọ và người thuê
+-   Cung cấp công cụ quản lý hiệu quả và minh bạch
+-   Hỗ trợ quyết định kinh doanh dựa trên dữ liệu
 
-### Phòng trọ (Room)
+---
 
--   Số phòng
--   Diện tích (m²)
--   Giá thuê
--   Tiền đặt cọc
--   Trạng thái (còn trống/đã thuê)
--   Số người ở tối đa
--   Tiện ích
--   Mô tả
--   Hình ảnh phòng trọ
--   Điểm đánh giá trung bình
+## ✨ Tính năng chính
 
-### Đặt phòng (Booking)
+### 🏢 **Quản lý Tòa nhà & Phòng trọ**
 
--   Người dùng đặt phòng
--   Phòng được đặt
--   Ngày chuyển vào dự kiến
--   Thời hạn thuê
--   Ghi chú
--   Trạng thái đặt phòng
+-   ✅ Quản lý thông tin tòa nhà (tên, địa chỉ, vị trí địa lý)
+-   ✅ Quản lý chi tiết phòng trọ (diện tích, giá cả, tiện ích)
+-   ✅ Theo dõi trạng thái phòng realtime (trống/đã thuê/bảo trì)
+-   ✅ Hỗ trợ phòng ở ghép với quản lý số lượng người/phòng
+-   ✅ Quản lý hình ảnh phòng với drag & drop upload
 
-### Hợp đồng (Contract)
+### 👥 **Hệ thống Người dùng & Phân quyền**
 
--   Số hợp đồng
--   Thông tin đặt phòng
--   Người thuê và chủ nhà
--   Ngày bắt đầu và kết thúc
--   Giá thuê hàng tháng
--   Tiền đặt cọc
--   Điều khoản và điều kiện
--   Đường dẫn tệp hợp đồng
--   Chữ ký điện tử
+-   ✅ **Admin**: Quản trị toàn hệ thống
+-   ✅ **Landlord (Chủ trọ)**: Quản lý tòa nhà và phòng trọ
+-   ✅ **Tenant (Người thuê)**: Tìm kiếm và đặt phòng
+-   ✅ Phân quyền chi tiết với Spatie Permission
+-   ✅ Middleware bảo mật cho từng route
 
-### Đánh giá (Review)
+### 📅 **Hệ thống Đặt phòng & Hợp đồng**
 
--   Phòng được đánh giá
--   Người dùng đánh giá
--   Điểm đánh giá
--   Nội dung đánh giá
+-   ✅ Đặt phòng trực tuyến với workflow duyệt
+-   ✅ Tạo hợp đồng điện tử tự động
+-   ✅ Quản lý chữ ký điện tử
+-   ✅ Theo dõi trạng thái hợp đồng (pending/active/expired/terminated)
+-   ✅ Xuất file PDF hợp đồng
 
-### Vị trí địa lý
+### ⭐ **Hệ thống Đánh giá & Phản hồi**
 
--   Tỉnh/Thành phố (Province)
--   Quận/Huyện (District)
--   Phường/Xã (Ward)
+-   ✅ Đánh giá phòng trọ (1-5 sao)
+-   ✅ Bình luận và chia sẻ trải nghiệm
+-   ✅ Tính toán điểm đánh giá trung bình
+-   ✅ Hiển thị review từ người thuê thực tế
 
-## Yêu cầu hệ thống
+### 📊 **Dashboard & Báo cáo**
 
--   PHP >= 8.2
--   Laravel 12.x
--   MySQL/SQLite
--   Composer
--   Bun (build tool)
+-   ✅ Dashboard admin với thống kê tổng quan
+-   ✅ Biểu đồ và metrics realtime
+-   ✅ Báo cáo doanh thu và hiệu suất
+-   ✅ Quản lý người thuê hiện tại
 
-## Cài đặt
+### 🗺️ **Hệ thống Địa lý**
 
-1. Clone dự án từ repository:
+-   ✅ Phân cấp địa lý 3 cấp: Tỉnh/Thành phố → Quận/Huyện → Phường/Xã
+-   ✅ API endpoint cho dropdown địa lý động
+-   ✅ Tìm kiếm theo vị trí địa lý
+
+---
+
+## 🏗️ Kiến trúc hệ thống
+
+### **Backend Architecture**
+
+```
+├── 🔧 Laravel 12.0 Framework
+├── 🛡️ Authentication & Authorization (Spatie Permission)
+├── 🗄️ Database Layer (SQLite/MySQL)
+├── 📡 RESTful API Endpoints
+├── 🎯 MVC Pattern Implementation
+└── 📋 Request Validation & Resources
+```
+
+### **Frontend Architecture**
+
+```
+├── 🎨 TailwindCSS 3.4 (Utility-first CSS)
+├── ⚡ Alpine.js 3.14 (Lightweight JS framework)
+├── 📱 Responsive Design (Mobile-first)
+├── 🔄 Vite 6.2 (Fast build tool)
+├── 🖼️ Dropzone.js (File uploads)
+└── 📊 Chart.js (Data visualization)
+```
+
+---
+
+## 🗃️ Cấu trúc Database
+
+### **Bảng chính**
+
+#### 🏢 **Buildings** (Tòa nhà)
+
+```sql
+- id, name, address
+- province_id, district_id, ward_id
+- user_id (chủ sở hữu)
+- timestamps
+```
+
+#### 🚪 **Rooms** (Phòng trọ)
+
+```sql
+- id, room_number, area, price, deposit
+- status (available/occupied), max_person
+- utilities, description, building_id
+- timestamps
+```
+
+#### 👤 **Users** (Người dùng)
+
+```sql
+- id, name, email, password
+- phone, address
+- email_verified_at, remember_token
+- timestamps
+```
+
+#### 📋 **Bookings** (Đặt phòng)
+
+```sql
+- id, user_id, room_id
+- desired_move_date, duration, note
+- status (pending/approved/rejected/cancelled)
+- timestamps
+```
+
+#### 📄 **Contracts** (Hợp đồng)
+
+```sql
+- id, contract_number, booking_id
+- room_id, tenant_id, landlord_id
+- start_date, end_date, monthly_rent, deposit_amount
+- terms_and_conditions, status, file_path
+- signature_path, signed_at, timestamps
+```
+
+#### ⭐ **Reviews** (Đánh giá)
+
+```sql
+- id, room_id, user_id
+- rating (1-5), comment
+- timestamps
+```
+
+#### 🖼️ **Images & Room_Images** (Hình ảnh)
+
+```sql
+Images: id, path, name, size, type, isMain
+Room_Images: room_id, image_id (pivot table)
+```
+
+### **Hệ thống Địa lý**
+
+```sql
+Provinces: id, name, code
+Districts: id, name, code, province_id
+Wards: id, name, code, district_id
+```
+
+### **Hệ thống Phân quyền (Spatie Permission)**
+
+```sql
+Roles: id, name, guard_name
+Permissions: id, name, guard_name
+Model_has_roles: model_id, role_id, model_type
+Role_has_permissions: role_id, permission_id
+```
+
+---
+
+## 🚀 Cài đặt và Triển khai
+
+### **Yêu cầu hệ thống**
+
+-   **PHP** >= 8.2
+-   **Composer** >= 2.0
+-   **Node.js** >= 18.0
+-   **NPM/Yarn** >= 8.0
+-   **Database**: SQLite/MySQL/PostgreSQL
+
+### **Bước 1: Clone project**
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/your-repo/tro-viet.git
 cd tro-viet
 ```
 
-2. Cài đặt các dependencies:
+### **Bước 2: Cài đặt dependencies**
 
 ```bash
+# Backend dependencies
 composer install
-bun install
+
+# Frontend dependencies
+npm install
 ```
 
-3. Tạo file .env và cấu hình database:
+### **Bước 3: Cấu hình môi trường**
 
 ```bash
+# Copy file cấu hình
 cp .env.example .env
+
+# Generate application key
 php artisan key:generate
+
+# Cấu hình database trong .env
+DB_CONNECTION=sqlite
+DB_DATABASE=/absolute/path/to/database/database.sqlite
 ```
 
-4. Cấu hình database trong file .env
-
-5. Chạy migrations và seeders:
+### **Bước 4: Thiết lập database**
 
 ```bash
-php artisan migrate --seed
+# Tạo database SQLite
+touch database/database.sqlite
+
+# Chạy migrations
+php artisan migrate
+
+# Chạy seeders (dữ liệu mẫu)
+php artisan db:seed
 ```
 
-6. Liên kết storage để lưu trữ hình ảnh:
+### **Bước 5: Build assets**
 
 ```bash
-php artisan storage:link
+# Development
+npm run dev
+
+# Production
+npm run build
 ```
 
-7. Khởi chạy ứng dụng:
+### **Bước 6: Khởi chạy ứng dụng**
 
 ```bash
+# Khởi động Laravel server
 php artisan serve
-bun run dev
+
+# Hoặc sử dụng Vite dev server (trong terminal khác)
+npm run dev
 ```
 
-## Công nghệ sử dụng
+🎉 **Truy cập ứng dụng tại**: `http://localhost:8000`
 
-### Backend
+---
 
--   Laravel 12.x - PHP framework
--   Spatie Permission - Quản lý phân quyền
--   Spatie Query Builder - Xây dựng và tối ưu hóa truy vấn
+## 👥 Tài khoản Demo
 
-### Frontend
+Sau khi chạy seeders, bạn có thể đăng nhập với các tài khoản sau:
 
--   Tailwind CSS - Framework CSS
--   Alpine.js - JavaScript framework
--   Dropzone.js - Upload file
--   Signature Pad - Chữ ký điện tử
+| Vai trò      | Email              | Password | Quyền hạn                  |
+| ------------ | ------------------ | -------- | -------------------------- |
+| **Admin**    | admin@gmail.com    | 12345678 | Quản trị toàn hệ thống     |
+| **Landlord** | landlord@gmail.com | 12345678 | Quản lý tòa nhà, phòng trọ |
+| **Tenant**   | tenant@gmail.com   | 12345678 | Tìm kiếm, đặt phòng        |
 
-### Build Tools
+---
 
--   Vite - Frontend build tool
--   Bun - JavaScript runtime
-
-## Cấu trúc thư mục
+## 🛠️ Cấu trúc thư mục
 
 ```
-app/
-  Http/
-    Controllers/      # Xử lý request
-    Middleware/       # Middleware
-    Requests/         # Form requests
-    Resources/        # API resources
-  Models/             # Eloquent models
-  Policies/           # Authorization policies
-  Providers/          # Service providers
-database/
-  migrations/         # Database migrations
-  seeders/            # Database seeders
-  factories/          # Model factories
-resources/
-  css/                # CSS files
-  js/                 # JavaScript files
-  views/              # Blade templates
-public/
-  storage/            # Public storage (uploaded files)
-routes/
-  web.php             # Web routes
-  api.php             # API routes
+tro-viet/
+├── 📁 app/
+│   ├── 📁 Http/
+│   │   ├── 📁 Controllers/        # API & Web Controllers
+│   │   │   ├── 📁 Admin/         # Admin Controllers
+│   │   │   ├── Auth/             # Authentication
+│   │   │   └── ...
+│   │   ├── 📁 Middleware/        # Custom Middleware
+│   │   ├── 📁 Requests/          # Form Requests
+│   │   └── 📁 Resources/         # API Resources
+│   ├── 📁 Models/                # Eloquent Models
+│   └── 📁 Providers/             # Service Providers
+├── 📁 database/
+│   ├── 📁 migrations/            # Database Migrations
+│   └── 📁 seeders/               # Database Seeders
+├── 📁 resources/
+│   ├── 📁 css/                   # Stylesheets
+│   ├── 📁 js/                    # JavaScript
+│   └── 📁 views/                 # Blade Templates
+├── 📁 routes/
+│   ├── api.php                   # API Routes
+│   ├── web.php                   # Web Routes
+│   └── auth.php                  # Auth Routes
+└── 📁 public/
+    └── 📁 admin/                 # Admin Assets
 ```
 
-## Tính năng quản trị
+---
 
--   Quản lý toàn bộ tòa nhà và phòng trọ
--   Quản lý người dùng và phân quyền
--   Xử lý đặt phòng và ký hợp đồng
--   Quản lý đánh giá
+## 🎨 Giao diện người dùng
 
-## Tính năng người dùng
+### **Dashboard Admin**
 
--   Tìm kiếm phòng trọ theo nhiều tiêu chí
--   Đặt phòng trực tuyến
--   Quản lý hợp đồng thuê phòng
--   Đánh giá và nhận xét về phòng đã thuê
+-   📊 Thống kê tổng quan hệ thống
+-   👥 Quản lý người dùng và phân quyền
+-   🏢 Quản lý tòa nhà và phòng trọ
+-   📋 Quản lý đặt phòng và hợp đồng
+-   📈 Báo cáo và analytics
 
-## Bảo mật và quyền hạn
+### **Giao diện Chủ trọ**
 
-Hệ thống phân quyền dựa trên Spatie Permission với các vai trò chính:
+-   🏢 Quản lý tòa nhà sở hữu
+-   🚪 Quản lý phòng trọ chi tiết
+-   📋 Xử lý đơn đặt phòng
+-   📄 Tạo và quản lý hợp đồng
+-   👥 Quản lý người thuê hiện tại
 
--   Admin: Toàn quyền quản lý hệ thống
--   Chủ nhà: Quản lý tòa nhà, phòng trọ và hợp đồng
--   Người thuê: Đặt phòng, xem hợp đồng và đánh giá
+### **Giao diện Người thuê**
 
-## Giấy phép
+-   🔍 Tìm kiếm phòng trọ
+-   📋 Đặt phòng trực tuyến
+-   📄 Xem và ký hợp đồng
+-   ⭐ Đánh giá phòng trọ
+-   📱 Dashboard cá nhân
 
-MIT License
+---
 
-Dự án được phát hành dưới giấy phép [MIT](https://opensource.org/licenses/MIT).
+## 📡 API Documentation
+
+### **Authentication Endpoints**
+
+```http
+POST   /login                    # Đăng nhập
+POST   /register                 # Đăng ký
+POST   /logout                   # Đăng xuất
+POST   /password/reset           # Reset password
+```
+
+### **Building & Room Management**
+
+```http
+GET    /api/buildings            # Danh sách tòa nhà
+POST   /api/buildings            # Tạo tòa nhà mới
+PUT    /api/buildings/{id}       # Cập nhật tòa nhà
+DELETE /api/buildings/{id}       # Xóa tòa nhà
+
+GET    /api/rooms                # Danh sách phòng
+POST   /api/rooms                # Tạo phòng mới
+PUT    /api/rooms/{id}           # Cập nhật phòng
+DELETE /api/rooms/{id}           # Xóa phòng
+```
+
+### **Booking & Contract Management**
+
+```http
+GET    /api/bookings             # Danh sách đặt phòng
+POST   /api/bookings             # Tạo đặt phòng
+PUT    /api/bookings/{id}        # Cập nhật đặt phòng
+DELETE /api/bookings/{id}        # Hủy đặt phòng
+
+GET    /api/contracts            # Danh sách hợp đồng
+POST   /api/contracts            # Tạo hợp đồng
+PUT    /api/contracts/{id}       # Cập nhật hợp đồng
+```
+
+### **Geographic Data**
+
+```http
+GET    /api/districts?province_id={id}  # Lấy quận/huyện theo tỉnh
+GET    /api/wards?district_id={id}      # Lấy phường/xã theo quận
+```
+
+### **Review System**
+
+```http
+GET    /api/rooms/{id}/reviews   # Danh sách review của phòng
+POST   /api/reviews              # Tạo review mới
+PUT    /api/reviews/{id}         # Cập nhật review
+DELETE /api/reviews/{id}         # Xóa review
+```
+
+---
+
+## 🔧 Công nghệ sử dụng
+
+### **Backend Technologies**
+
+| Công nghệ                | Version | Mô tả                       |
+| ------------------------ | ------- | --------------------------- |
+| **Laravel**              | 12.0    | PHP Framework chính         |
+| **Spatie Permission**    | 6.16    | Quản lý roles & permissions |
+| **Spatie Query Builder** | 6.3     | API query filtering         |
+| **Laravel Breeze**       | 2.3     | Authentication scaffolding  |
+| **Pest**                 | 3.7     | Testing framework           |
+
+### **Frontend Technologies**
+
+| Công nghệ       | Version      | Mô tả                       |
+| --------------- | ------------ | --------------------------- |
+| **TailwindCSS** | 3.4.17       | Utility-first CSS framework |
+| **Alpine.js**   | 3.14.9       | Lightweight JS framework    |
+| **Vite**        | 6.2.5        | Build tool và dev server    |
+| **Dropzone**    | 6.0.0-beta.2 | File upload library         |
+| **Chart.js**    | Latest       | Data visualization          |
+
+### **Development Tools**
+
+-   **Laravel Pint** - Code formatting
+-   **Laravel Pail** - Log monitoring
+-   **Laravel Sail** - Docker development environment
+-   **Laravel Tinker** - Interactive shell
+
+---
+
+## 🧪 Testing
+
+### **Chạy Tests**
+
+```bash
+# Chạy tất cả tests
+php artisan test
+
+# Chạy tests với coverage
+php artisan test --coverage
+
+# Chạy specific test file
+php artisan test tests/Feature/AuthTest.php
+```
+
+### **Test Coverage**
+
+-   ✅ **Unit Tests**: Model validation, business logic
+-   ✅ **Feature Tests**: HTTP requests, authentication
+-   ✅ **Browser Tests**: End-to-end user workflows
+
+---
+
+## 📈 Performance & Optimization
+
+### **Database Optimization**
+
+-   ✅ Indexed foreign keys
+-   ✅ Eager loading relationships
+-   ✅ Query optimization với Spatie Query Builder
+-   ✅ Database caching strategies
+
+### **Frontend Optimization**
+
+-   ✅ Vite build optimization
+-   ✅ TailwindCSS purging unused styles
+-   ✅ Image optimization và lazy loading
+-   ✅ Alpine.js lightweight interactions
+
+### **Caching Strategy**
+
+-   ✅ Route caching
+-   ✅ Config caching
+-   ✅ View caching
+-   ✅ Permission caching
+
+---
+
+## 🔒 Bảo mật
+
+### **Security Features**
+
+-   ✅ **CSRF Protection**: Tự động với Laravel
+-   ✅ **SQL Injection Prevention**: Eloquent ORM
+-   ✅ **XSS Protection**: Blade template escaping
+-   ✅ **Authentication**: Laravel Breeze
+-   ✅ **Authorization**: Role-based access control
+-   ✅ **File Upload Security**: Validation và sanitization
+-   ✅ **Rate Limiting**: API throttling
+
+### **Best Practices**
+
+-   ✅ Input validation với Form Requests
+-   ✅ Password hashing với bcrypt
+-   ✅ Secure session management
+-   ✅ HTTPS enforcement (production)
+-   ✅ Environment variable protection
+
+---
+
+## 🚀 Deployment
+
+### **Production Deployment**
+
+```bash
+# Optimize for production
+composer install --optimize-autoloader --no-dev
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+
+# Build assets
+npm run build
+
+# Set permissions
+chmod -R 755 storage bootstrap/cache
+```
+
+### **Environment Configuration**
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.com
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=tro_viet_production
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+CACHE_DRIVER=redis
+SESSION_DRIVER=redis
+QUEUE_CONNECTION=redis
+```
+
+---
+
+## 🤝 Đóng góp
+
+Chúng tôi hoan nghênh mọi đóng góp! Vui lòng đọc [CONTRIBUTING.md](CONTRIBUTING.md) để biết chi tiết.
+
+### **Quy trình đóng góp**
+
+1. **Fork** repository
+2. **Tạo branch** cho feature (`git checkout -b feature/AmazingFeature`)
+3. **Commit** changes (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** lên branch (`git push origin feature/AmazingFeature`)
+5. **Tạo Pull Request**
+
+### **Coding Standards**
+
+-   PSR-12 coding standard
+-   Laravel best practices
+-   Comprehensive testing
+-   Clear documentation
+
+---
+
+## 📝 License
+
+Dự án này được phân phối dưới **MIT License**. Xem [LICENSE](LICENSE) để biết thêm thông tin.
+
+---
+
+## 👨‍💻 Tác giả
+
+-   **Team TRO-VIET** - _Initial work_ - [GitHub](https://github.com/tro-viet-team)
+
+---
+
+## 📞 Liên hệ
+
+-   **Email**: support@tro-viet.com
+-   **Website**: https://tro-viet.com
+-   **Facebook**: https://facebook.com/tro.viet.app
+-   **Zalo**: 0123456789
+
+---
+
+## 🙏 Acknowledgments
+
+-   Laravel Framework team
+-   TailwindCSS team
+-   Alpine.js community
+-   Spatie team cho các packages tuyệt vời
+-   Toàn bộ Laravel community
+
+---
+
+<p align="center">
+  <strong>🏠 TRO-VIET - Kết nối không gian sống lý tưởng 🏠</strong><br>
+  Made with ❤️ in Vietnam
+</p>

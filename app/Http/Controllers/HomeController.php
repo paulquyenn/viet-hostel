@@ -179,7 +179,7 @@ class HomeController extends Controller
             });
         }
 
-        $rooms = $query->paginate(9)->appends($request->all());
+        $rooms = $query->paginate(6)->appends($request->all());
 
         return view('motel', [
             'provinces' => $provinces,
