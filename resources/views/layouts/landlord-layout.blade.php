@@ -116,70 +116,7 @@
     </header>
 
     <!-- ======= Sidebar ======= -->
-    <aside id="sidebar" class="sidebar">
-        <ul class="sidebar-nav" id="sidebar-nav">
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('dashboard') ? '' : 'collapsed' }}"
-                    href="{{ route('dashboard') }}">
-                    <i class="bi bi-grid"></i>
-                    <span>Tổng quan</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#building-nav" data-bs-toggle="collapse"
-                    href="#">
-                    <i class="bi bi-building"></i><span>Quản lý nhà trọ</span><i
-                        class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="building-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="{{ route('landlord.buildings.index') }}">
-                            <i class="bi bi-circle"></i><span>Danh sách nhà trọ</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('landlord.buildings.create') }}">
-                            <i class="bi bi-circle"></i><span>Thêm nhà trọ</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#rooms-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-door-open"></i><span>Quản lý phòng</span><i
-                        class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="rooms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="{{ route('landlord.rooms.index') }}">
-                            <i class="bi bi-circle"></i><span>Danh sách phòng</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('landlord.rooms.create') }}">
-                            <i class="bi bi-circle"></i><span>Thêm phòng</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('admin.contracts.index') }}">
-                    <i class="bi bi-file-earmark-text"></i>
-                    <span>Quản lý hợp đồng</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('admin.bookings.index') }}">
-                    <i class="bi bi-calendar-check"></i>
-                    <span>Đặt phòng</span>
-                </a>
-            </li>
-        </ul>
-    </aside>
+    <x-layouts.side-bar />
 
     <main id="main" class="main">
         {{ $slot }}

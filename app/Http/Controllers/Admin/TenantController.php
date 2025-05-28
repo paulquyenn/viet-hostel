@@ -16,7 +16,7 @@ class TenantController extends Controller
     public function index(Request $request)
     {
         // Kiểm tra quyền admin/chủ trọ
-        if (!Auth::user() || !Auth::user()->hasRole('admin')) {
+        if (!Auth::user() || !Auth::user()->hasAnyRole(['admin', 'landlord'])) {
             abort(403, 'Bạn không có quyền truy cập chức năng này.');
         }
 
@@ -66,7 +66,7 @@ class TenantController extends Controller
     public function show(User $tenant)
     {
         // Kiểm tra quyền admin/chủ trọ
-        if (!Auth::user() || !Auth::user()->hasRole('admin')) {
+        if (!Auth::user() || !Auth::user()->hasAnyRole(['admin', 'landlord'])) {
             abort(403, 'Bạn không có quyền truy cập chức năng này.');
         }
 
@@ -105,7 +105,7 @@ class TenantController extends Controller
     public function stats()
     {
         // Kiểm tra quyền admin/chủ trọ
-        if (!Auth::user() || !Auth::user()->hasRole('admin')) {
+        if (!Auth::user() || !Auth::user()->hasAnyRole(['admin', 'landlord'])) {
             abort(403, 'Bạn không có quyền truy cập chức năng này.');
         }
 
