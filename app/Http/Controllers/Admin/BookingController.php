@@ -17,9 +17,25 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $bookings = Booking::with(['room.building', 'user'])
-            ->latest()
-            ->paginate(10);
+        $user = Auth::user();
+
+        if ($user->hasRole('admin')) {
+            // Admin xem tất cả booking
+            $bookings = Booking::with(['room.building', 'user'])
+                ->latest()
+                ->paginate(10);
+        } elseif ($user->hasRole('landlord')) {
+            // Landlord chỉ xem booking của các phòng thuộc sở hữu
+            $bookings = Booking::with(['room.building', 'user'])
+                ->whereHas('room.building', function ($query) use ($user) {
+                    $query->where('user_id', $user->id); // Chủ trọ sở hữu building
+                })
+                ->latest()
+                ->paginate(10);
+        } else {
+            // Các role khác không có quyền truy cập
+            abort(403, 'Bạn không có quyền truy cập trang này.');
+        }
 
         return view('admin.bookings.index', compact('bookings'));
     }
