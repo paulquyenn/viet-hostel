@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
 use App\Models\Room;
 use Illuminate\Http\Request;
@@ -57,7 +58,7 @@ class BookingController extends Controller
     /**
      * Lưu đơn đặt phòng mới
      */
-    public function store(Request $request, Room $room)
+    public function store(StoreBookingRequest $request, Room $room)
     {
         // Kiểm tra xem người dùng đã có hợp đồng active hay chưa
         if (Auth::user()->hasActiveContract()) {
@@ -84,12 +85,8 @@ class BookingController extends Controller
             return redirect()->back()->with('error', 'Phòng này đã đầy, không thể đặt thêm.');
         }
 
-        // Validate dữ liệu đầu vào
-        $validated = $request->validate([
-            'desired_move_date' => 'required|date|after:today',
-            'duration' => 'required|integer|min:1|max:36',
-            'note' => 'nullable|string|max:500',
-        ]);
+        // Lấy dữ liệu đã validate
+        $validated = $request->validated();
 
         // Tạo booking mới
         $booking = new Booking();

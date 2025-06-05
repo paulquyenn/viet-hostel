@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreContractRequest;
+use App\Http\Requests\UpdateContractRequest;
 use App\Models\Booking;
 use App\Models\Contract;
 use Carbon\Carbon;
@@ -168,7 +170,7 @@ class ContractController extends Controller
     /**
      * Lưu hợp đồng mới (Admin & Landlord)
      */
-    public function store(Request $request)
+    public function store(StoreContractRequest $request)
     {
         $user = Auth::user();
 
@@ -179,15 +181,7 @@ class ContractController extends Controller
 
         $this->authorize('create', Contract::class);
 
-        $validated = $request->validate([
-            'booking_id' => 'required|exists:bookings,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'monthly_rent' => 'required|numeric|min:0',
-            'deposit_amount' => 'required|numeric|min:0',
-            'terms_and_conditions' => 'required|string',
-            'contract_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
-        ]);
+        $validated = $request->validated();
 
         $booking = Booking::findOrFail($validated['booking_id']);
 
@@ -252,7 +246,7 @@ class ContractController extends Controller
     /**
      * Cập nhật hợp đồng (Admin & Landlord)
      */
-    public function update(Request $request, Contract $contract)
+    public function update(UpdateContractRequest $request, Contract $contract)
     {
         $user = Auth::user();
 
@@ -268,14 +262,7 @@ class ContractController extends Controller
 
         $this->authorize('update', $contract);
 
-        $validated = $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'monthly_rent' => 'required|numeric|min:0',
-            'deposit_amount' => 'required|numeric|min:0',
-            'terms_and_conditions' => 'required|string',
-            'contract_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
-        ]);
+        $validated = $request->validated();
 
         $contract->start_date = $validated['start_date'];
         $contract->end_date = $validated['end_date'];

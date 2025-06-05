@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreAdminContractRequest;
+use App\Http\Requests\TerminateContractRequest;
+use App\Http\Requests\UpdateAdminContractRequest;
 use App\Models\Booking;
 use App\Models\Contract;
 use App\Models\Room;
@@ -99,23 +102,12 @@ class ContractController extends Controller
     /**
      * Lưu hợp đồng mới
      */
-    public function store(Request $request)
+    public function store(StoreAdminContractRequest $request)
     {
         $user = Auth::user();
 
-        // Validate dữ liệu
-        $validated = $request->validate([
-            'booking_id' => 'nullable|exists:bookings,id',
-            'room_id' => 'required|exists:rooms,id',
-            'tenant_id' => 'required|exists:users,id',
-            'landlord_id' => 'required|exists:users,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'monthly_rent' => 'required|numeric|min:0',
-            'deposit_amount' => 'required|numeric|min:0',
-            'terms_and_conditions' => 'required|string',
-            'contract_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
-        ]);
+        // Lấy dữ liệu đã validate
+        $validated = $request->validated();
 
         // Kiểm tra quyền tạo hợp đồng cho phòng này
         $room = Room::find($validated['room_id']);
@@ -211,7 +203,7 @@ class ContractController extends Controller
     /**
      * Cập nhật hợp đồng
      */
-    public function update(Request $request, Contract $contract)
+    public function update(UpdateAdminContractRequest $request, Contract $contract)
     {
         $user = Auth::user();
 
@@ -232,18 +224,8 @@ class ContractController extends Controller
             return redirect()->back()->with('error', 'Không thể chỉnh sửa hợp đồng đã được ký.');
         }
 
-        // Validate dữ liệu
-        $validated = $request->validate([
-            'room_id' => 'required|exists:rooms,id',
-            'tenant_id' => 'required|exists:users,id',
-            'landlord_id' => 'required|exists:users,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'monthly_rent' => 'required|numeric|min:0',
-            'deposit_amount' => 'required|numeric|min:0',
-            'terms_and_conditions' => 'required|string',
-            'contract_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
-        ]);
+        // Lấy dữ liệu đã validate
+        $validated = $request->validated();
 
         // Nếu thay đổi phòng, cần kiểm tra trạng thái phòng mới
         if ($validated['room_id'] != $contract->room_id) {
@@ -310,7 +292,7 @@ class ContractController extends Controller
     /**
      * Chấm dứt hợp đồng
      */
-    public function terminate(Request $request, Contract $contract)
+    public function terminate(TerminateContractRequest $request, Contract $contract)
     {
         $user = Auth::user();
 
@@ -331,12 +313,11 @@ class ContractController extends Controller
             return redirect()->back()->with('error', 'Không thể chấm dứt hợp đồng này.');
         }
 
-        $request->validate([
-            'termination_reason' => 'required|string|max:500',
-        ]);
+        // Lấy dữ liệu đã validate
+        $validated = $request->validated();
 
         $contract->status = 'terminated';
-        $contract->terms_and_conditions .= "\n\nLý do chấm dứt: " . $request->termination_reason;
+        $contract->terms_and_conditions .= "\n\nLý do chấm dứt: " . $validated['termination_reason'];
         $contract->save();
 
         // Cập nhật trạng thái phòng thành "Còn trống"
