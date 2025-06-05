@@ -45,6 +45,20 @@ class BookingController extends Controller
      */
     public function show(Booking $booking)
     {
+        $user = Auth::user();
+
+        // Kiểm tra quyền xem
+        if ($user->hasRole('admin')) {
+            // Admin có thể xem tất cả
+        } elseif ($user->hasRole('landlord')) {
+            // Landlord chỉ có thể xem booking của phòng thuộc sở hữu
+            if ($booking->room->building->user_id !== $user->id) {
+                abort(403, 'Bạn không có quyền xem đặt phòng này.');
+            }
+        } else {
+            abort(403, 'Bạn không có quyền truy cập trang này.');
+        }
+
         $booking->load(['room.building', 'user']);
 
         return view('admin.bookings.show', compact('booking'));
@@ -55,6 +69,20 @@ class BookingController extends Controller
      */
     public function approve(Booking $booking)
     {
+        $user = Auth::user();
+
+        // Kiểm tra quyền duyệt
+        if ($user->hasRole('admin')) {
+            // Admin có thể duyệt tất cả
+        } elseif ($user->hasRole('landlord')) {
+            // Landlord chỉ có thể duyệt booking của phòng thuộc sở hữu
+            if ($booking->room->building->user_id !== $user->id) {
+                abort(403, 'Bạn không có quyền duyệt đặt phòng này.');
+            }
+        } else {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
+
         if ($booking->status !== 'pending') {
             return redirect()->back()->with('error', 'Chỉ có thể duyệt yêu cầu đang chờ xử lý.');
         }
@@ -78,6 +106,20 @@ class BookingController extends Controller
      */
     public function reject(Request $request, Booking $booking)
     {
+        $user = Auth::user();
+
+        // Kiểm tra quyền từ chối
+        if ($user->hasRole('admin')) {
+            // Admin có thể từ chối tất cả
+        } elseif ($user->hasRole('landlord')) {
+            // Landlord chỉ có thể từ chối booking của phòng thuộc sở hữu
+            if ($booking->room->building->user_id !== $user->id) {
+                abort(403, 'Bạn không có quyền từ chối đặt phòng này.');
+            }
+        } else {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
+
         if ($booking->status !== 'pending') {
             return redirect()->back()->with('error', 'Chỉ có thể từ chối yêu cầu đang chờ xử lý.');
         }

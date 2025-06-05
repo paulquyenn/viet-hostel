@@ -23,16 +23,19 @@ class BuildingController extends Controller
      */
     public function index(Request $request)
     {
-        $columns = Schema::getColumnListing('buildings');
+        $user = Auth::user();
+        $query = QueryBuilder::for(Building::class)
+            ->allowedFilters(['name', 'address', 'ward_id', 'district_id', 'province_id'])
+            ->allowedSorts(['name', 'address', 'created_at'])
+            ->with(['ward', 'district', 'province', 'user']);
 
-        $buildings = QueryBuilder::for(Building::class)
-            ->allowedFilters($columns)
-            ->allowedSorts($columns)
-            ->paginate()
-            ->appends($request->query());
-        return view('building.index', [
-            'buildings' => BuildingResource::collection($buildings),
-        ]);
+        if ($user && $user->hasRole('landlord')) {
+            $query->where('user_id', $user->id);
+        }
+
+        $buildings = $query->paginate(10);
+
+        return view('building.index', compact('buildings'));
     }
 
     /**
@@ -72,6 +75,13 @@ class BuildingController extends Controller
      */
     public function show(Building $building)
     {
+        $user = Auth::user();
+
+        // Kiểm tra quyền xem building
+        if ($user && $user->hasRole('landlord') && $building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền xem tòa nhà này.');
+        }
+
         $building->load(['rooms', 'ward', 'district', 'province']);
         return view('building.show', compact('building'));
     }
@@ -81,6 +91,13 @@ class BuildingController extends Controller
      */
     public function edit(Building $building)
     {
+        $user = Auth::user();
+
+        // Kiểm tra quyền chỉnh sửa building
+        if ($user && $user->hasRole('landlord') && $building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền chỉnh sửa tòa nhà này.');
+        }
+
         $building = new BuildingResource($building);
         return view('building.edit', [
             'building' => $building,
@@ -96,7 +113,15 @@ class BuildingController extends Controller
      */
     public function update(UpdateBuildingRequest $request, Building $building)
     {
-        $data = $request->all();        $building->update($data);
+        $user = Auth::user();
+
+        // Kiểm tra quyền cập nhật building
+        if ($user && $user->hasRole('landlord') && $building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền cập nhật tòa nhà này.');
+        }
+
+        $data = $request->all();
+        $building->update($data);
         return redirect()->route($this->getRoutePrefix() . 'buildings.index');
     }
 
@@ -105,6 +130,13 @@ class BuildingController extends Controller
      */
     public function destroy(Building $building)
     {
+        $user = Auth::user();
+
+        // Kiểm tra quyền xóa building
+        if ($user && $user->hasRole('landlord') && $building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền xóa tòa nhà này.');
+        }
+
         try {
             $building->delete();
             return redirect()->route($this->getRoutePrefix() . 'buildings.index');

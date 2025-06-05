@@ -16,9 +16,9 @@ class BuildingSeeder extends Seeder
         // Get province, district, ward, and user IDs dynamically
         $ngheAnProvince = DB::table('provinces')->where('name', 'Nghệ An')->first();
         $vinhDistrict = DB::table('districts')->where('name', 'Thành phố Vinh')->first();
-        $landlordUser = DB::table('users')->where('email', 'landlord@gmail.com')->first();
+        $adminUser = DB::table('users')->where('email', 'admin@gmail.com')->first();
 
-        if (!$ngheAnProvince || !$vinhDistrict || !$landlordUser) {
+        if (!$ngheAnProvince || !$vinhDistrict || !$adminUser) {
             throw new \Exception('Required province, district, or user not found. Please run ProviceSeeder, DistrictSeeder, and UserSeeder first.');
         }
 
@@ -46,7 +46,7 @@ class BuildingSeeder extends Seeder
                 'province_id' => $ngheAnProvince->id,
                 'district_id' => $vinhDistrict->id,
                 'ward_id' => $wards['Phường Lê Lợi']->id,
-                'user_id' => $landlordUser->id,
+                'user_id' => $adminUser->id,
             ],
             [
                 'name' => 'Nhà trọ Đại học Vinh',
@@ -54,7 +54,7 @@ class BuildingSeeder extends Seeder
                 'province_id' => $ngheAnProvince->id,
                 'district_id' => $vinhDistrict->id,
                 'ward_id' => $wards['Phường Hưng Bình']->id,
-                'user_id' => $landlordUser->id,
+                'user_id' => $adminUser->id,
             ],
             [
                 'name' => 'Khu trọ An Khang',
@@ -62,7 +62,7 @@ class BuildingSeeder extends Seeder
                 'province_id' => $ngheAnProvince->id,
                 'district_id' => $vinhDistrict->id,
                 'ward_id' => $wards['Phường Quang Trung']->id,
-                'user_id' => $landlordUser->id,
+                'user_id' => $adminUser->id,
             ],
             [
                 'name' => 'Nhà trọ Hòa Bình',
@@ -70,7 +70,7 @@ class BuildingSeeder extends Seeder
                 'province_id' => $ngheAnProvince->id,
                 'district_id' => $vinhDistrict->id,
                 'ward_id' => $wards['Phường Trung Đô']->id,
-                'user_id' => $landlordUser->id,
+                'user_id' => $adminUser->id,
             ],
             [
                 'name' => 'Khu trọ Thành Công',
@@ -78,7 +78,7 @@ class BuildingSeeder extends Seeder
                 'province_id' => $ngheAnProvince->id,
                 'district_id' => $vinhDistrict->id,
                 'ward_id' => $wards['Phường Hưng Bình']->id,
-                'user_id' => $landlordUser->id,
+                'user_id' => $adminUser->id,
             ]
         ];
 

@@ -22,16 +22,23 @@ class RoomController extends Controller
      */
     public function index(Request $request)
     {
-        $columns = Schema::getColumnListing('rooms');
-        $rooms = QueryBuilder::for(Room::class)
-            ->allowedFilters($columns)
-            ->allowedSorts($columns)
-            ->paginate()
-            ->appends($request->query());
+        $user = Auth::user();
+        $query = Room::with(['building', 'images']);
 
-        return view('room.index', [
-            'rooms' => RoomResource::collection($rooms),
-        ]);
+        if ($user && $user->hasRole('landlord')) {
+            // Landlord chỉ xem được phòng thuộc các tòa nhà của mình
+            $query->whereHas('building', function ($buildingQuery) use ($user) {
+                $buildingQuery->where('user_id', $user->id);
+            });
+        }
+        // Admin có thể xem tất cả phòng (không cần thêm điều kiện)
+
+        $rooms = QueryBuilder::for($query)
+            ->allowedFilters(['room_number', 'status', 'building_id'])
+            ->allowedSorts(['room_number', 'price', 'created_at'])
+            ->paginate(10);
+
+        return view('room.index', compact('rooms'));
     }
 
     /**
@@ -39,7 +46,16 @@ class RoomController extends Controller
      */
     public function create()
     {
-        $buildings = Building::all();
+        $user = Auth::user();
+
+        if ($user && $user->hasRole('landlord')) {
+            // Landlord chỉ có thể tạo phòng trong tòa nhà của mình
+            $buildings = Building::where('user_id', $user->id)->get();
+        } else {
+            // Admin có thể tạo phòng trong bất kỳ tòa nhà nào
+            $buildings = Building::all();
+        }
+
         $status = [
             'available' => 'Còn trống',
             'occupied' => 'Đã thuê'
@@ -55,7 +71,16 @@ class RoomController extends Controller
      */
     public function store(StoreRoomRequest $request)
     {
+        $user = Auth::user();
         $data = $request->all();
+
+        // Kiểm tra quyền tạo phòng trong tòa nhà này
+        if ($user && $user->hasRole('landlord')) {
+            $building = Building::find($data['building_id']);
+            if (!$building || $building->user_id !== $user->id) {
+                abort(403, 'Bạn không có quyền tạo phòng trong tòa nhà này.');
+            }
+        }
 
         \Log::info('Tạo phòng mới với dữ liệu:', ['data' => $data]);
 
@@ -107,6 +132,13 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
+        $user = Auth::user();
+
+        // Kiểm tra quyền xem phòng
+        if ($user && $user->hasRole('landlord') && $room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền xem phòng này.');
+        }
+
         return view('room.show', [
             'room' => new RoomResource($room),
         ]);
@@ -117,8 +149,20 @@ class RoomController extends Controller
      */
     public function edit(string $id)
     {
+        $user = Auth::user();
         $room = Room::findOrFail($id);
-        $buildings = Building::all();
+
+        // Kiểm tra quyền chỉnh sửa phòng
+        if ($user && $user->hasRole('landlord') && $room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền chỉnh sửa phòng này.');
+        }
+
+        if ($user && $user->hasRole('landlord')) {
+            $buildings = Building::where('user_id', $user->id)->get();
+        } else {
+            $buildings = Building::all();
+        }
+
         $status = [
             'available' => 'Còn trống',
             'occupied' => 'Đã thuê'
@@ -135,7 +179,14 @@ class RoomController extends Controller
      */
     public function update(UpdateRoomRequest $request, string $id)
     {
+        $user = Auth::user();
         $room = Room::findOrFail($id);
+
+        // Kiểm tra quyền cập nhật phòng
+        if ($user && $user->hasRole('landlord') && $room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền cập nhật phòng này.');
+        }
+
         $data = $request->all();
 
         \Log::info('Cập nhật phòng', [
@@ -198,7 +249,13 @@ class RoomController extends Controller
      */
     public function destroy(string $id)
     {
+        $user = Auth::user();
         $room = Room::findOrFail($id);
+
+        // Kiểm tra quyền xóa phòng
+        if ($user && $user->hasRole('landlord') && $room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền xóa phòng này.');
+        }
 
         $room->delete();
         return redirect()->route($this->getRoutePrefix() . 'rooms.index');

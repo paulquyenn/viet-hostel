@@ -13,8 +13,8 @@ class ContractPolicy
      */
     public function create(User $user): bool
     {
-        // Chỉ admin/chủ trọ mới có quyền tạo hợp đồng mới
-        return $user->hasRole('admin');
+        // Admin hoặc chủ trọ có quyền tạo hợp đồng mới
+        return $user->hasRole('admin') || $user->hasRole('landlord');
     }
 
     /**
@@ -32,8 +32,17 @@ class ContractPolicy
      */
     public function update(User $user, Contract $contract): bool
     {
-        // Chỉ admin/chủ trọ mới có quyền chỉnh sửa và hợp đồng chưa được ký
-        return $user->hasRole('admin') && !$contract->isSigned();
+        // Admin có thể chỉnh sửa bất kỳ hợp đồng nào chưa được ký
+        if ($user->hasRole('admin')) {
+            return !$contract->isSigned();
+        }
+
+        // Chủ trọ chỉ có thể chỉnh sửa hợp đồng của property họ sở hữu và chưa được ký
+        if ($user->hasRole('landlord')) {
+            return $contract->room->building->user_id === $user->id && !$contract->isSigned();
+        }
+
+        return false;
     }
 
     /**
@@ -41,9 +50,23 @@ class ContractPolicy
      */
     public function sign(User $user, Contract $contract): bool
     {
-        // Chỉ admin/chủ trọ hoặc người thuê mới có quyền ký
-        return ($user->id === $contract->tenant_id || $user->id === $contract->landlord_id || $user->hasRole('admin'))
-            && !$contract->isSigned();
+        // Hợp đồng đã được ký thì không thể ký lại
+        if ($contract->isSigned()) {
+            return false;
+        }
+
+        // Admin có quyền ký bất kỳ hợp đồng nào
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+
+        // Chủ trọ có thể ký hợp đồng của property họ sở hữu
+        if ($user->hasRole('landlord')) {
+            return $contract->room->building->user_id === $user->id;
+        }
+
+        // Người thuê có thể ký hợp đồng của họ
+        return $user->id === $contract->tenant_id;
     }
 
     /**
@@ -51,7 +74,21 @@ class ContractPolicy
      */
     public function terminate(User $user, Contract $contract): bool
     {
-        // Chỉ admin/chủ trọ mới có quyền chấm dứt và hợp đồng phải đã được ký và đang hiệu lực
-        return $user->hasRole('admin') && $contract->isSigned() && $contract->status === 'active';
+        // Hợp đồng phải đã được ký và đang hiệu lực
+        if (!$contract->isSigned() || $contract->status !== 'active') {
+            return false;
+        }
+
+        // Admin có thể chấm dứt bất kỳ hợp đồng nào
+        if ($user->hasRole('admin')) {
+            return true;
+        }
+
+        // Chủ trọ có thể chấm dứt hợp đồng của property họ sở hữu
+        if ($user->hasRole('landlord')) {
+            return $contract->room->building->user_id === $user->id;
+        }
+
+        return false;
     }
 }

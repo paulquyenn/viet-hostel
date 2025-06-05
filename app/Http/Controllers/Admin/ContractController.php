@@ -19,9 +19,24 @@ class ContractController extends Controller
      */
     public function index()
     {
-        $contracts = Contract::with(['room.building', 'tenant', 'landlord'])
-            ->latest()
-            ->paginate(10);
+        $user = Auth::user();
+
+        if ($user->hasRole('admin')) {
+            // Admin xem tất cả hợp đồng
+            $contracts = Contract::with(['room.building', 'tenant', 'landlord'])
+                ->latest()
+                ->paginate(10);
+        } elseif ($user->hasRole('landlord')) {
+            // Landlord chỉ xem hợp đồng của các phòng thuộc sở hữu
+            $contracts = Contract::with(['room.building', 'tenant', 'landlord'])
+                ->whereHas('room.building', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
+                ->latest()
+                ->paginate(10);
+        } else {
+            abort(403, 'Bạn không có quyền truy cập trang này.');
+        }
 
         return view('admin.contracts.index', compact('contracts'));
     }
@@ -31,19 +46,48 @@ class ContractController extends Controller
      */
     public function create(Booking $booking)
     {
+        $user = Auth::user();
+
+        // Kiểm tra quyền tạo hợp đồng
+        if ($user->hasRole('admin')) {
+            // Admin có thể tạo tất cả
+        } elseif ($user->hasRole('landlord')) {
+            // Landlord chỉ có thể tạo hợp đồng cho phòng thuộc sở hữu
+            if ($booking->room->building->user_id !== $user->id) {
+                abort(403, 'Bạn không có quyền tạo hợp đồng cho đặt phòng này.');
+            }
+        } else {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
+
         // Load các mối quan hệ cần thiết
         $booking->load(['room.building.province', 'room.building.district', 'room.building.ward', 'user']);
         $room = $booking->room;
         $tenant = $booking->user;
 
-        // Lấy danh sách phòng trống để hiển thị tùy chọn khác
-        $rooms = Room::where('status', 'available')->with('building')->get();
+        // Lấy danh sách phòng trống dựa trên role
+        if ($user->hasRole('admin')) {
+            $rooms = Room::where('status', 'available')->with('building')->get();
+        } else {
+            // Landlord chỉ xem phòng của mình
+            $rooms = Room::where('status', 'available')
+                ->whereHas('building', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
+                ->with('building')
+                ->get();
+        }
 
         // Lấy danh sách người thuê tiềm năng
         $tenants = User::role('tenant')->get();
 
-        // Lấy danh sách chủ trọ
-        $landlords = User::role('admin')->get();
+        // Lấy danh sách chủ trọ dựa trên role
+        if ($user->hasRole('admin')) {
+            $landlords = User::role('admin')->get();
+        } else {
+            // Landlord chỉ có thể đặt mình làm chủ trọ
+            $landlords = collect([$user]);
+        }
 
         // Chuẩn bị giá trị mặc định cho ngày bắt đầu và kết thúc hợp đồng
         $startDate = $booking->desired_move_date ? $booking->desired_move_date->format('Y-m-d') : now()->format('Y-m-d');
@@ -57,6 +101,8 @@ class ContractController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+
         // Validate dữ liệu
         $validated = $request->validate([
             'booking_id' => 'nullable|exists:bookings,id',
@@ -71,8 +117,13 @@ class ContractController extends Controller
             'contract_file' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
         ]);
 
-        // Kiểm tra xem phòng có trạng thái "available" không
+        // Kiểm tra quyền tạo hợp đồng cho phòng này
         $room = Room::find($validated['room_id']);
+        if ($user->hasRole('landlord') && $room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền tạo hợp đồng cho phòng này.');
+        }
+
+        // Kiểm tra xem phòng có trạng thái "available" không
         if ($room->status !== 'available') {
             return redirect()->back()->with('error', 'Phòng này đã có người thuê.');
         }
@@ -162,6 +213,20 @@ class ContractController extends Controller
      */
     public function update(Request $request, Contract $contract)
     {
+        $user = Auth::user();
+
+        // Kiểm tra quyền chỉnh sửa hợp đồng
+        if ($user->hasRole('admin')) {
+            // Admin có thể chỉnh sửa tất cả
+        } elseif ($user->hasRole('landlord')) {
+            // Landlord chỉ có thể chỉnh sửa hợp đồng của phòng thuộc sở hữu
+            if ($contract->room->building->user_id !== $user->id) {
+                abort(403, 'Bạn không có quyền chỉnh sửa hợp đồng này.');
+            }
+        } else {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
+
         // Chỉ cho phép chỉnh sửa hợp đồng chưa ký
         if ($contract->isSigned()) {
             return redirect()->back()->with('error', 'Không thể chỉnh sửa hợp đồng đã được ký.');
@@ -247,6 +312,20 @@ class ContractController extends Controller
      */
     public function terminate(Request $request, Contract $contract)
     {
+        $user = Auth::user();
+
+        // Kiểm tra quyền chấm dứt hợp đồng
+        if ($user->hasRole('admin')) {
+            // Admin có thể chấm dứt tất cả
+        } elseif ($user->hasRole('landlord')) {
+            // Landlord chỉ có thể chấm dứt hợp đồng của phòng thuộc sở hữu
+            if ($contract->room->building->user_id !== $user->id) {
+                abort(403, 'Bạn không có quyền chấm dứt hợp đồng này.');
+            }
+        } else {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
+
         // Chỉ cho phép chấm dứt hợp đồng đã ký và đang hiệu lực
         if (!$contract->isSigned() || $contract->status !== 'active') {
             return redirect()->back()->with('error', 'Không thể chấm dứt hợp đồng này.');
@@ -274,6 +353,20 @@ class ContractController extends Controller
      */
     public function download(Contract $contract)
     {
+        $user = Auth::user();
+
+        // Kiểm tra quyền download hợp đồng
+        if ($user->hasRole('admin')) {
+            // Admin có thể download tất cả
+        } elseif ($user->hasRole('landlord')) {
+            // Landlord chỉ có thể download hợp đồng của phòng thuộc sở hữu
+            if ($contract->room->building->user_id !== $user->id) {
+                abort(403, 'Bạn không có quyền tải xuống hợp đồng này.');
+            }
+        } else {
+            abort(403, 'Bạn không có quyền thực hiện hành động này.');
+        }
+
         if (!$contract->file_path) {
             return redirect()->back()->with('error', 'Không tìm thấy file hợp đồng.');
         }

@@ -104,17 +104,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('images', ImageController::class)->except(['destroy']);
         Route::resource('room_image', RoomImageController::class)->except(['destroy']);
 
-        // View bookings related to landlord's properties
+        // Booking management for landlord's properties
         Route::prefix('bookings')->name('bookings.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('index');
             Route::get('/{booking}', [\App\Http\Controllers\Admin\BookingController::class, 'show'])->name('show');
+            Route::post('/{booking}/approve', [\App\Http\Controllers\Admin\BookingController::class, 'approve'])->name('approve');
+            Route::post('/{booking}/reject', [\App\Http\Controllers\Admin\BookingController::class, 'reject'])->name('reject');
         });
 
-        // View contracts related to landlord's properties
+        // Contract management for landlord's properties
         Route::prefix('contracts')->name('contracts.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\ContractController::class, 'index'])->name('index');
+            Route::get('/create/{booking}', [\App\Http\Controllers\Admin\ContractController::class, 'create'])->name('create');
+            Route::post('/', [\App\Http\Controllers\Admin\ContractController::class, 'store'])->name('store');
             Route::get('/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'show'])->name('show');
             Route::get('/{contract}/download', [\App\Http\Controllers\Admin\ContractController::class, 'download'])->name('download');
+            Route::get('/{contract}/edit', [\App\Http\Controllers\Admin\ContractController::class, 'edit'])->name('edit');
+            Route::put('/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'update'])->name('update');
+            Route::post('/{contract}/sign', [\App\Http\Controllers\Admin\ContractController::class, 'sign'])->name('sign');
+            Route::post('/{contract}/terminate', [\App\Http\Controllers\Admin\ContractController::class, 'terminate'])->name('terminate');
         });
 
         // View tenants in landlord's properties

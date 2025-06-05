@@ -15,23 +15,42 @@ class TenantController extends Controller
      */
     public function index(Request $request)
     {
+        $user = Auth::user();
+
         // Kiểm tra quyền admin/chủ trọ
-        if (!Auth::user() || !Auth::user()->hasAnyRole(['admin', 'landlord'])) {
+        if (!$user || !$user->hasAnyRole(['admin', 'landlord'])) {
             abort(403, 'Bạn không có quyền truy cập chức năng này.');
         }
 
-        // Lấy danh sách người thuê từ các hợp đồng hiện tại của chủ trọ
-        $query = User::role('tenant')
-            ->whereHas('contracts', function ($q) {
-                $q->where('landlord_id', auth()->id())
-                  ->where('status', 'active'); // Chỉ lấy hợp đồng đang hiệu lực
-            })
-            ->with(['contracts' => function ($q) {
-                $q->where('landlord_id', auth()->id())
-                  ->where('status', 'active')
-                  ->with(['room.building']);
-            }])
-            ->orderBy('name');
+        if ($user->hasRole('admin')) {
+            // Admin xem tất cả tenant có hợp đồng active
+            $query = User::role('tenant')
+                ->whereHas('contracts', function ($q) {
+                    $q->where('status', 'active');
+                })
+                ->with(['contracts' => function ($q) {
+                    $q->where('status', 'active')
+                      ->with(['room.building']);
+                }])
+                ->orderBy('name');
+        } else {
+            // Landlord chỉ xem tenant của các phòng thuộc sở hữu
+            $query = User::role('tenant')
+                ->whereHas('contracts', function ($q) use ($user) {
+                    $q->whereHas('room.building', function ($buildingQuery) use ($user) {
+                        $buildingQuery->where('user_id', $user->id);
+                    })
+                    ->where('status', 'active');
+                })
+                ->with(['contracts' => function ($q) use ($user) {
+                    $q->whereHas('room.building', function ($buildingQuery) use ($user) {
+                        $buildingQuery->where('user_id', $user->id);
+                    })
+                    ->where('status', 'active')
+                    ->with(['room.building']);
+                }])
+                ->orderBy('name');
+        }
 
         // Tìm kiếm theo tên hoặc email
         if ($request->has('search') && !empty($request->search)) {
@@ -52,10 +71,14 @@ class TenantController extends Controller
 
         $tenants = $query->paginate(15);
 
-        // Lấy danh sách tòa nhà của chủ trọ để filter
-        $buildings = \App\Models\Building::where('user_id', auth()->id())
-            ->orderBy('name')
-            ->get();
+        // Lấy danh sách tòa nhà dựa trên role
+        if ($user->hasRole('admin')) {
+            $buildings = \App\Models\Building::orderBy('name')->get();
+        } else {
+            $buildings = \App\Models\Building::where('user_id', $user->id)
+                ->orderBy('name')
+                ->get();
+        }
 
         return view('admin.tenants.index', compact('tenants', 'buildings'));
     }
@@ -65,16 +88,27 @@ class TenantController extends Controller
      */
     public function show(User $tenant)
     {
+        $user = Auth::user();
+
         // Kiểm tra quyền admin/chủ trọ
-        if (!Auth::user() || !Auth::user()->hasAnyRole(['admin', 'landlord'])) {
+        if (!$user || !$user->hasAnyRole(['admin', 'landlord'])) {
             abort(403, 'Bạn không có quyền truy cập chức năng này.');
         }
 
-        // Kiểm tra xem tenant này có thuê phòng của chủ trọ không
-        $hasActiveContract = $tenant->contracts()
-            ->where('landlord_id', auth()->id())
-            ->where('status', 'active')
-            ->exists();
+        if ($user->hasRole('admin')) {
+            // Admin có thể xem tất cả tenant
+            $hasActiveContract = $tenant->contracts()
+                ->where('status', 'active')
+                ->exists();
+        } else {
+            // Landlord chỉ xem tenant thuê phòng của mình
+            $hasActiveContract = $tenant->contracts()
+                ->whereHas('room.building', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
+                ->where('status', 'active')
+                ->exists();
+        }
 
         if (!$hasActiveContract) {
             abort(404, 'Không tìm thấy thông tin người thuê này.');

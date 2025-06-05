@@ -76,28 +76,48 @@ class ContractController extends Controller
         return response()->download($path, $downloadName, ['Content-Type' => $mimeType]);
     }
     /**
-     * Hiển thị danh sách hợp đồng (Admin)
+     * Hiển thị danh sách hợp đồng (Admin & Landlord)
      */
     public function adminIndex()
     {
-        // Direct admin role check
-        if (!Auth::user() || !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized action. Only administrators can access this page.');
+        $user = Auth::user();
+
+        // Kiểm tra quyền truy cập
+        if (!$user || !$user->hasAnyRole(['admin', 'landlord'])) {
+            abort(403, 'Bạn không có quyền truy cập trang này.');
         }
 
-        $contracts = Contract::with(['tenant', 'landlord', 'room.building'])->latest()->paginate(10);
+        if ($user->hasRole('admin')) {
+            // Admin xem tất cả hợp đồng
+            $contracts = Contract::with(['tenant', 'landlord', 'room.building'])->latest()->paginate(10);
+        } elseif ($user->hasRole('landlord')) {
+            // Landlord chỉ xem hợp đồng của các phòng thuộc sở hữu
+            $contracts = Contract::with(['tenant', 'landlord', 'room.building'])
+                ->whereHas('room.building', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
+                ->latest()
+                ->paginate(10);
+        }
 
         return view('admin.contracts.index', compact('contracts'));
     }
 
     /**
-     * Hiển thị chi tiết hợp đồng (Admin)
+     * Hiển thị chi tiết hợp đồng (Admin & Landlord)
      */
     public function adminShow(Contract $contract)
     {
-        // Direct admin role check
-        if (!Auth::user() || !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized action. Only administrators can access this page.');
+        $user = Auth::user();
+
+        // Kiểm tra quyền truy cập
+        if (!$user || !$user->hasAnyRole(['admin', 'landlord'])) {
+            abort(403, 'Bạn không có quyền truy cập trang này.');
+        }
+
+        // Kiểm tra quyền xem hợp đồng cụ thể
+        if ($user->hasRole('landlord') && $contract->room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền xem hợp đồng này.');
         }
 
         $contract->load(['tenant', 'landlord', 'room.building.ward.district.province', 'booking']);
@@ -106,13 +126,20 @@ class ContractController extends Controller
     }
 
     /**
-     * Hiển thị form tạo hợp đồng (Admin)
+     * Hiển thị form tạo hợp đồng (Admin & Landlord)
      */
     public function create(Booking $booking)
     {
-        // Direct admin role check
-        if (!Auth::user() || !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized action. Only administrators can access this page.');
+        $user = Auth::user();
+
+        // Kiểm tra quyền truy cập
+        if (!$user || !$user->hasAnyRole(['admin', 'landlord'])) {
+            abort(403, 'Bạn không có quyền truy cập trang này.');
+        }
+
+        // Kiểm tra quyền tạo hợp đồng cho booking này
+        if ($user->hasRole('landlord') && $booking->room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền tạo hợp đồng cho đặt phòng này.');
         }
 
         $this->authorize('create', Contract::class);
@@ -139,13 +166,15 @@ class ContractController extends Controller
     }
 
     /**
-     * Lưu hợp đồng mới (Admin)
+     * Lưu hợp đồng mới (Admin & Landlord)
      */
     public function store(Request $request)
     {
-        // Direct admin role check
-        if (!Auth::user() || !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized action. Only administrators can access this page.');
+        $user = Auth::user();
+
+        // Kiểm tra quyền truy cập
+        if (!$user || !$user->hasAnyRole(['admin', 'landlord'])) {
+            abort(403, 'Bạn không có quyền truy cập trang này.');
         }
 
         $this->authorize('create', Contract::class);
@@ -162,6 +191,11 @@ class ContractController extends Controller
 
         $booking = Booking::findOrFail($validated['booking_id']);
 
+        // Kiểm tra quyền tạo hợp đồng cho booking này
+        if ($user->hasRole('landlord') && $booking->room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền tạo hợp đồng cho đặt phòng này.');
+        }
+
         // Tạo mã hợp đồng ngẫu nhiên
         $contractNumber = 'HD' . date('Ymd') . '-' . strtoupper(Str::random(6));
 
@@ -170,7 +204,7 @@ class ContractController extends Controller
             'booking_id' => $booking->id,
             'room_id' => $booking->room_id,
             'tenant_id' => $booking->user_id,
-            'landlord_id' => Auth::id(), // Hiện tại là admin/chủ trọ tạo hợp đồng
+            'landlord_id' => $user->id, // Người tạo hợp đồng (admin/landlord)
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
             'monthly_rent' => $validated['monthly_rent'],
@@ -192,13 +226,20 @@ class ContractController extends Controller
     }
 
     /**
-     * Hiển thị form chỉnh sửa hợp đồng (Admin)
+     * Hiển thị form chỉnh sửa hợp đồng (Admin & Landlord)
      */
     public function edit(Contract $contract)
     {
-        // Direct admin role check
-        if (!Auth::user() || !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized action. Only administrators can access this page.');
+        $user = Auth::user();
+
+        // Kiểm tra quyền truy cập
+        if (!$user || !$user->hasAnyRole(['admin', 'landlord'])) {
+            abort(403, 'Bạn không có quyền truy cập trang này.');
+        }
+
+        // Kiểm tra quyền chỉnh sửa hợp đồng cụ thể
+        if ($user->hasRole('landlord') && $contract->room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền chỉnh sửa hợp đồng này.');
         }
 
         $this->authorize('update', $contract);
@@ -209,13 +250,20 @@ class ContractController extends Controller
     }
 
     /**
-     * Cập nhật hợp đồng (Admin)
+     * Cập nhật hợp đồng (Admin & Landlord)
      */
     public function update(Request $request, Contract $contract)
     {
-        // Direct admin role check
-        if (!Auth::user() || !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized action. Only administrators can access this page.');
+        $user = Auth::user();
+
+        // Kiểm tra quyền truy cập
+        if (!$user || !$user->hasAnyRole(['admin', 'landlord'])) {
+            abort(403, 'Bạn không có quyền truy cập trang này.');
+        }
+
+        // Kiểm tra quyền cập nhật hợp đồng cụ thể
+        if ($user->hasRole('landlord') && $contract->room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền cập nhật hợp đồng này.');
         }
 
         $this->authorize('update', $contract);
@@ -252,7 +300,7 @@ class ContractController extends Controller
             ->with('success', 'Đã cập nhật hợp đồng thành công.');
     }
     /**
-     * Ký hợp đồng (Tenant & Admin)
+     * Ký hợp đồng (Tenant, Admin & Landlord)
      */
     public function sign(Request $request, Contract $contract)
     {
@@ -286,7 +334,7 @@ class ContractController extends Controller
         }
 
         // Determine the appropriate redirect route based on user role
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasAnyRole(['admin', 'landlord'])) {
             return redirect()->route('admin.contracts.show', $contract)
                 ->with('success', 'Hợp đồng đã được xác nhận thành công.');
         } else {
@@ -295,13 +343,20 @@ class ContractController extends Controller
         }
     }
     /**
-     * Chấm dứt hợp đồng (Admin)
+     * Chấm dứt hợp đồng (Admin & Landlord)
      */
     public function terminate(Contract $contract)
     {
-        // Direct admin role check
-        if (!Auth::user() || !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized action. Only administrators can access this page.');
+        $user = Auth::user();
+
+        // Kiểm tra quyền truy cập
+        if (!$user || !$user->hasAnyRole(['admin', 'landlord'])) {
+            abort(403, 'Bạn không có quyền truy cập trang này.');
+        }
+
+        // Kiểm tra quyền chấm dứt hợp đồng cụ thể
+        if ($user->hasRole('landlord') && $contract->room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền chấm dứt hợp đồng này.');
         }
 
         $this->authorize('terminate', $contract);
@@ -316,5 +371,55 @@ class ContractController extends Controller
 
         return redirect()->route('admin.contracts.index')
             ->with('success', 'Đã chấm dứt hợp đồng thành công.');
+    }
+
+    /**
+     * Download file hợp đồng (Admin & Landlord)
+     */
+    public function adminDownload(Contract $contract)
+    {
+        $user = Auth::user();
+
+        // Kiểm tra quyền truy cập
+        if (!$user || !$user->hasAnyRole(['admin', 'landlord'])) {
+            abort(403, 'Bạn không có quyền truy cập trang này.');
+        }
+
+        // Kiểm tra quyền download hợp đồng cụ thể
+        if ($user->hasRole('landlord') && $contract->room->building->user_id !== $user->id) {
+            abort(403, 'Bạn không có quyền tải xuống hợp đồng này.');
+        }
+
+        if (!$contract->file_path) {
+            return redirect()->back()->with('error', 'Không tìm thấy file hợp đồng.');
+        }
+
+        $path = Storage::disk('public')->path($contract->file_path);
+        $originalName = pathinfo($contract->file_path, PATHINFO_BASENAME);
+        $extension = pathinfo($contract->file_path, PATHINFO_EXTENSION);
+
+        // Use the original file extension rather than forcing PDF extension
+        $downloadName = $contract->contract_number . '.' . $extension;
+
+        // Add explicit mime type based on extension
+        $mimeTypes = [
+            'pdf' => 'application/pdf',
+            'doc' => 'application/msword',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+
+        $mimeType = $mimeTypes[strtolower($extension)] ?? 'application/octet-stream';
+
+        // Check if file exists and is readable
+        if (!file_exists($path) || !is_readable($path)) {
+            return redirect()->back()->with('error', 'Không thể đọc file hợp đồng.');
+        }
+
+        // Use inline disposition for PDF files to view in browser
+        if (strtolower($extension) === 'pdf') {
+            return response()->file($path, ['Content-Type' => $mimeType]);
+        }
+
+        return response()->download($path, $downloadName, ['Content-Type' => $mimeType]);
     }
 }

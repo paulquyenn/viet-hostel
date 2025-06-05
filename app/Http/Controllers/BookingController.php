@@ -142,12 +142,21 @@ class BookingController extends Controller
     public function adminIndex()
     {
         // Direct admin role check
-        if (!Auth::user() || !Auth::user()->hasRole('admin')) {
-            abort(403, 'Unauthorized action. Only administrators can access this page.');
+        if (!Auth::user() || (!Auth::user()->hasRole('admin') && !Auth::user()->hasRole('landlord'))) {
+            abort(403, 'Unauthorized action. Only administrators and landlords can access this page.');
         }
 
-        // Chỉ admin mới có quyền xem tất cả các booking
-        $bookings = Booking::with(['user', 'room.building'])->latest()->paginate(10);
+        $query = Booking::with(['room.building', 'user']);
+
+        // Nếu là landlord, chỉ hiển thị booking của phòng họ đăng
+        if (Auth::user()->hasRole('landlord')) {
+            $query->whereHas('room', function ($q) {
+                $q->where('user_id', Auth::id());
+            });
+        }
+
+        $bookings = $query->latest()->paginate(10);
+
         return view('admin.bookings.index', compact('bookings'));
     }
 

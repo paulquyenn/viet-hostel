@@ -31,6 +31,10 @@ class BookingPolicy
      */
     public function approve(User $user, Booking $booking): bool
     {
+        // Kiểm tra xem booking có thuộc về property của landlord không
+        if ($user->hasRole('landlord')) {
+            return $booking->property->landlord_id === $user->id;
+        }
         // Chỉ admin mới có quyền duyệt
         return $user->hasRole('admin');
     }
