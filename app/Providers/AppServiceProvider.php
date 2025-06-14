@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Use Bootstrap 4 for pagination views
+        Paginator::useBootstrap();
+
         // Create the storage symbolic link if it doesn't exist
         if (!file_exists(public_path('storage'))) {
             try {
