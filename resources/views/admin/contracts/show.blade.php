@@ -235,25 +235,55 @@
                                         <small>Hợp đồng đang chờ người thuê xác nhận</small>
                                     </div>
                                 @elseif($contract->status == 'active')
-                                    <form action="{{ route('admin.contracts.terminate', $contract->id) }}"
-                                        method="POST" class="d-inline">
-                                        @csrf
-                                        <button type="submit"
-                                            onclick="return confirm('Bạn có chắc chắn muốn chấm dứt hợp đồng này?')"
-                                            class="btn btn-danger d-inline-flex align-items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="currentColor" viewBox="0 0 16 16" class="me-2">
-                                                <path
-                                                    d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
-                                            </svg>
-                                            Chấm dứt hợp đồng
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-danger d-inline-flex align-items-center"
+                                        data-bs-toggle="modal" data-bs-target="#terminateModal">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" viewBox="0 0 16 16" class="me-2">
+                                            <path
+                                                d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
+                                        </svg>
+                                        Chấm dứt hợp đồng
+                                    </button>
                                 @endif
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Modal Chấm dứt hợp đồng -->
+    <div class="modal fade" id="terminateModal" tabindex="-1" aria-labelledby="terminateModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="terminateModalLabel">Chấm dứt hợp đồng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form
+                    action="{{ Auth::user()->hasRole('admin') ? route('admin.contracts.terminate', $contract->id) : route('landlord.contracts.terminate', $contract->id) }}"
+                    method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Bạn có chắc chắn muốn chấm dứt hợp đồng này? Hành động này không thể hoàn tác.
+                        </div>
+                        <div class="mb-3">
+                            <label for="termination_reason" class="form-label">Lý do chấm dứt <span
+                                    class="text-danger">*</span></label>
+                            <textarea class="form-control" id="termination_reason" name="termination_reason" rows="4"
+                                placeholder="Nhập lý do chấm dứt hợp đồng..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">Chấm dứt hợp đồng</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

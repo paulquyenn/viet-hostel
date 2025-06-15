@@ -6,6 +6,7 @@ use App\Http\Requests\StoreContractRequest;
 use App\Http\Requests\UpdateContractRequest;
 use App\Models\Booking;
 use App\Models\Contract;
+use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -330,7 +331,7 @@ class ContractController extends Controller
 
         // Cập nhật trạng thái phòng thành trống
         $room = $contract->room;
-        $room->status = 0; // 0 = Còn trống
+        $room->status = Room::STATUS_AVAILABLE;
         $room->save();
 
         return redirect()->route('admin.contracts.index')

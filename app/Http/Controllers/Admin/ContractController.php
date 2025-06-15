@@ -313,25 +313,21 @@ class ContractController extends Controller
             abort(403, 'Bạn không có quyền thực hiện hành động này.');
         }
 
-        // Chỉ cho phép chấm dứt hợp đồng đã ký và đang hiệu lực
-        if (!$contract->isSigned() || $contract->status !== 'active') {
+        // Kiểm tra xem hợp đồng có thể được chấm dứt không
+        if (!$contract->canBeTerminated()) {
             return redirect()->back()->with('error', 'Không thể chấm dứt hợp đồng này.');
         }
 
         // Lấy dữ liệu đã validate
         $validated = $request->validated();
 
-        $contract->status = 'terminated';
-        $contract->terms_and_conditions .= "\n\nLý do chấm dứt: " . $validated['termination_reason'];
-        $contract->save();
+        // Sử dụng method mới từ model
+        if ($contract->terminate($validated['termination_reason'])) {
+            return redirect()->route('admin.contracts.index')
+                ->with('success', 'Đã chấm dứt hợp đồng thành công.');
+        }
 
-        // Cập nhật trạng thái phòng thành "Còn trống"
-        $room = Room::find($contract->room_id);
-        $room->status = 0; // Còn trống
-        $room->save();
-
-        return redirect()->route('admin.contracts.index')
-            ->with('success', 'Đã chấm dứt hợp đồng thành công.');
+        return redirect()->back()->with('error', 'Không thể chấm dứt hợp đồng này.');
     }
 
     /**

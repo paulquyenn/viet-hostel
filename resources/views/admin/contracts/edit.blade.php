@@ -260,16 +260,10 @@
                                                     </a>
 
                                                     @if ($contract->status == 'active')
-                                                        <form method="POST"
-                                                            action="{{ route('admin.contracts.terminate', $contract->id) }}"
-                                                            class="d-inline">
-                                                            @csrf
-                                                            <button type="submit"
-                                                                class="btn btn-outline-danger btn-sm"
-                                                                onclick="return confirm('Bạn có chắc chắn muốn chấm dứt hợp đồng này?')">
-                                                                Chấm dứt hợp đồng
-                                                            </button>
-                                                        </form>
+                                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                                            data-bs-toggle="modal" data-bs-target="#terminateModal">
+                                                            Chấm dứt hợp đồng
+                                                        </button>
                                                     @endif
                                                 </div>
                                             </div>
@@ -316,6 +310,41 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Modal Chấm dứt hợp đồng -->
+    <div class="modal fade" id="terminateModal" tabindex="-1" aria-labelledby="terminateModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="terminateModalLabel">Chấm dứt hợp đồng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form
+                    action="{{ Auth::user()->hasRole('admin') ? route('admin.contracts.terminate', $contract->id) : route('landlord.contracts.terminate', $contract->id) }}"
+                    method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Bạn có chắc chắn muốn chấm dứt hợp đồng này? Hành động này không thể hoàn tác.
+                        </div>
+                        <div class="mb-3">
+                            <label for="termination_reason" class="form-label">Lý do chấm dứt <span
+                                    class="text-danger">*</span></label>
+                            <textarea class="form-control" id="termination_reason" name="termination_reason" rows="4"
+                                placeholder="Nhập lý do chấm dứt hợp đồng..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">Chấm dứt hợp đồng</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

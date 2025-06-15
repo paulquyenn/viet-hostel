@@ -96,8 +96,8 @@ class Contract extends Model
             $this->save();
 
             // Cập nhật trạng thái phòng thành đã thuê
-            if ($this->room && $this->room->status === 'available') {
-                $this->room->status = 'occupied';
+            if ($this->room && $this->room->status === Room::STATUS_AVAILABLE) {
+                $this->room->status = Room::STATUS_OCCUPIED;
                 $this->room->save();
             }
 
@@ -127,5 +127,40 @@ class Contract extends Model
         $months = $end->month - $start->month;
 
         return $years * 12 + $months;
+    }
+
+    /**
+     * Chấm dứt hợp đồng
+     */
+    public function terminate($reason = null)
+    {
+        if ($this->status === 'active' && $this->isSigned()) {
+            $this->status = 'terminated';
+
+            // Thêm lý do chấm dứt vào terms_and_conditions nếu có
+            if ($reason) {
+                $this->terms_and_conditions .= "\n\nLý do chấm dứt: " . $reason;
+            }
+
+            $this->save();
+
+            // Cập nhật trạng thái phòng thành còn trống
+            if ($this->room) {
+                $this->room->status = Room::STATUS_AVAILABLE;
+                $this->room->save();
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Kiểm tra xem hợp đồng có thể được chấm dứt hay không
+     */
+    public function canBeTerminated()
+    {
+        return $this->status === 'active' && $this->isSigned();
     }
 }
