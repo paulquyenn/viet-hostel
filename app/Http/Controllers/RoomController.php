@@ -82,17 +82,13 @@ class RoomController extends Controller
             }
         }
 
-        \Log::info('Tạo phòng mới với dữ liệu:', ['data' => $data]);
-
         // Tạo phòng mới
         $room = Room::create($data);
-        \Log::info('Đã tạo phòng mới:', ['room_id' => $room->id]);
 
         // Liên kết ảnh đã tải lên với phòng mới
         if ($request->filled('image_ids')) {
             try {
                 $imageIds = json_decode($request->image_ids, true);
-                \Log::info('Xử lý ID ảnh:', ['image_ids' => $imageIds]);
 
                 if (is_array($imageIds) && count($imageIds) > 0) {
                     foreach ($imageIds as $imageId) {
@@ -101,27 +97,14 @@ class RoomController extends Controller
                             'room_id' => $room->id,
                             'image_id' => $imageId
                         ]);
-                        \Log::info('Đã liên kết ảnh với phòng:', [
-                            'room_id' => $room->id,
-                            'image_id' => $imageId,
-                            'room_image_id' => $roomImage->id
-                        ]);
                     }
 
                     // Tải lại mối quan hệ images để đảm bảo dữ liệu mới nhất
                     $room->load('images');
-                    \Log::info('Số ảnh đã liên kết:', ['count' => $room->images->count()]);
                 }
             } catch (\Exception $e) {
-                // Log lỗi nếu có
-                \Log::error('Lỗi khi liên kết ảnh với phòng: ' . $e->getMessage(), [
-                    'exception' => $e,
-                    'room_id' => $room->id,
-                    'image_ids' => $request->image_ids
-                ]);
+                // Có thể thêm xử lý lỗi ở đây nếu cần
             }
-        } else {
-            \Log::info('Không có ID ảnh để xử lý');
         }
 
         return redirect()->route($this->getRoutePrefix() . 'rooms.index')->with('success', 'Phòng đã được tạo thành công.');
@@ -189,18 +172,12 @@ class RoomController extends Controller
 
         $data = $request->all();
 
-        \Log::info('Cập nhật phòng', [
-            'room_id' => $id,
-            'has_new_images' => $request->filled('new_image_ids')
-        ]);
-
         $room->update($data);
 
         // Xử lý ảnh mới được tải lên (nếu có)
         if ($request->filled('new_image_ids')) {
             try {
                 $newImageIds = json_decode($request->new_image_ids, true);
-                \Log::info('Xử lý ID ảnh mới:', ['new_image_ids' => $newImageIds]);
 
                 if (is_array($newImageIds) && count($newImageIds) > 0) {
                     foreach ($newImageIds as $imageId) {
@@ -215,16 +192,6 @@ class RoomController extends Controller
                                 'room_id' => $room->id,
                                 'image_id' => $imageId
                             ]);
-                            \Log::info('Đã liên kết ảnh mới với phòng:', [
-                                'room_id' => $room->id,
-                                'image_id' => $imageId,
-                                'room_image_id' => $roomImage->id
-                            ]);
-                        } else {
-                            \Log::info('Liên kết ảnh đã tồn tại:', [
-                                'room_id' => $room->id,
-                                'image_id' => $imageId
-                            ]);
                         }
                     }
 
@@ -232,12 +199,7 @@ class RoomController extends Controller
                     $room->load('images');
                 }
             } catch (\Exception $e) {
-                // Log lỗi nếu có
-                \Log::error('Lỗi khi liên kết ảnh mới với phòng: ' . $e->getMessage(), [
-                    'exception' => $e,
-                    'room_id' => $room->id,
-                    'new_image_ids' => $request->new_image_ids
-                ]);
+                // Có thể thêm xử lý lỗi ở đây nếu cần
             }
         }
 
