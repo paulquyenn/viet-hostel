@@ -22,7 +22,7 @@ class UserController extends Controller
         $user = QueryBuilder::for(User::class)
             ->allowedFilters($columns)
             ->allowedSorts($columns)
-            ->paginate()
+            ->paginate(10)
             ->appends($request->query());
 
         return view('user.index', [

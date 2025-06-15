@@ -7,7 +7,6 @@ use App\Http\Resources\ImageResource;
 use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -49,12 +48,6 @@ class ImageController extends Controller
             $files = $request->file('file');
             $image = [];
 
-            Log::info('Bắt đầu tải ảnh lên', [
-                'file_count' => count($files),
-                'has_room_id' => $request->filled('room_id'),
-                'room_id' => $request->room_id
-            ]);
-
             foreach ($files as $file) {
                 try {
                     // Lấy extension gốc của file
@@ -63,10 +56,6 @@ class ImageController extends Controller
                     // Kiểm tra định dạng file hợp lệ
                     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
                     if (!in_array($originalExtension, $allowedExtensions)) {
-                        Log::warning('File extension không được hỗ trợ', [
-                            'file' => $file->getClientOriginalName(),
-                            'extension' => $originalExtension
-                        ]);
                         continue;
                     }
 
@@ -93,20 +82,7 @@ class ImageController extends Controller
                         'isMain' => $request->input('isMain', 0)
                     ];
 
-                    Log::info('Lưu thông tin ảnh', [
-                        'name' => $data['name'],
-                        'path' => $path,
-                        'size' => $data['size']
-                    ]);
-
-                    // Debug trước khi tạo bản ghi
-                    Log::info('Chuẩn bị tạo bản ghi ảnh', [
-                        'data' => $data,
-                        'request_all' => $request->all()
-                    ]);
-
                     $img = Image::create($data);
-                    Log::info('Đã tạo bản ghi ảnh', ['image_id' => $img->id]);
 
                     $image[] = $img;
 
@@ -114,38 +90,17 @@ class ImageController extends Controller
                     if ($request->filled('room_id')) {
                         try {
                             $room_id = $request->room_id;
-                            Log::info('Chuẩn bị liên kết ảnh với phòng', [
-                                'room_id' => $room_id,
-                                'image_id' => $img->id,
-                                'room_exists' => \App\Models\Room::where('id', $room_id)->exists()
-                            ]);
 
                             $roomImage = \App\Models\RoomImage::create([
                                 'room_id' => $room_id,
                                 'image_id' => $img->id
                             ]);
 
-                            Log::info('Đã liên kết ảnh với phòng', [
-                                'room_id' => $room_id,
-                                'image_id' => $img->id,
-                                'room_image_id' => $roomImage->id
-                            ]);
                         } catch (\Exception $e) {
-                            Log::error('Lỗi khi liên kết ảnh với phòng: ' . $e->getMessage(), [
-                                'exception' => $e,
-                                'trace' => $e->getTraceAsString(),
-                                'room_id' => $request->room_id,
-                                'image_id' => $img->id
-                            ]);
+                            // Có thể thêm xử lý lỗi ở đây nếu cần
                         }
-                    } else {
-                        Log::info('Không có room_id, ảnh sẽ được liên kết sau', ['image_id' => $img->id]);
                     }
                 } catch (\Exception $e) {
-                    Log::error('Lỗi khi xử lý file: ' . $e->getMessage(), [
-                        'file' => $file->getClientOriginalName(),
-                        'exception' => $e
-                    ]);
                     continue;
                 }
             }
@@ -155,7 +110,6 @@ class ImageController extends Controller
                 'message' => 'Tải ảnh lên thành công'
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Lỗi khi tải ảnh lên: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json([
                 'message' => 'Có lỗi xảy ra khi tải ảnh lên'
             ], 500);
@@ -204,10 +158,6 @@ class ImageController extends Controller
                 'message' => 'Đã xóa ảnh thành công'
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Lỗi khi xóa ảnh: ' . $e->getMessage(), [
-                'image_id' => $image->id,
-                'exception' => $e
-            ]);
             return response()->json([
                 'message' => 'Có lỗi xảy ra khi xóa ảnh'
             ], 500);
@@ -221,7 +171,6 @@ class ImageController extends Controller
     {
         // Kiểm tra xem GD extension có được kích hoạt không
         if (!extension_loaded('gd')) {
-            Log::warning('GD extension không được kích hoạt, sử dụng file gốc');
             return file_get_contents($file->getRealPath());
         }
 
@@ -230,7 +179,6 @@ class ImageController extends Controller
             $imageInfo = getimagesize($file->getRealPath());
 
             if (!$imageInfo) {
-                Log::warning('File không phải là hình ảnh hợp lệ, sử dụng file gốc');
                 return file_get_contents($file->getRealPath());
             }
 
@@ -249,17 +197,14 @@ class ImageController extends Controller
                     if (function_exists('imagecreatefromwebp')) {
                         $sourceImage = imagecreatefromwebp($file->getRealPath());
                     } else {
-                        Log::warning('WebP không được hỗ trợ, sử dụng file gốc');
                         return file_get_contents($file->getRealPath());
                     }
                     break;
                 default:
-                    Log::warning('Định dạng hình ảnh không được hỗ trợ: ' . $imageInfo['mime'] . ', sử dụng file gốc');
                     return file_get_contents($file->getRealPath());
             }
 
             if (!$sourceImage) {
-                Log::warning('Không thể tạo image resource, sử dụng file gốc');
                 return file_get_contents($file->getRealPath());
             }
 
@@ -323,17 +268,9 @@ class ImageController extends Controller
             imagedestroy($sourceImage);
             imagedestroy($optimizedImage);
 
-            Log::info('Đã tối ưu hình ảnh', [
-                'original_size' => $originalWidth . 'x' . $originalHeight,
-                'new_size' => $newWidth . 'x' . $newHeight
-            ]);
-
             return $imageData;
 
         } catch (\Exception $e) {
-            Log::error('Lỗi khi tối ưu hình ảnh: ' . $e->getMessage(), [
-                'exception' => $e
-            ]);
             // Trường hợp có lỗi, trả về file gốc
             return file_get_contents($file->getRealPath());
         }
@@ -359,15 +296,10 @@ class ImageController extends Controller
                 $count++;
             }
 
-            Log::info('Đã dọn dẹp ảnh không sử dụng', [
-                'count' => $count
-            ]);
-
             return response()->json([
                 'message' => "Đã xóa $count ảnh không sử dụng"
             ]);
         } catch (\Exception $e) {
-            Log::error('Lỗi khi dọn dẹp ảnh: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json([
                 'message' => 'Có lỗi xảy ra khi dọn dẹp ảnh không sử dụng'
             ], 500);

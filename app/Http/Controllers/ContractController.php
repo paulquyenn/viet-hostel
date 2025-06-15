@@ -6,6 +6,7 @@ use App\Http\Requests\StoreContractRequest;
 use App\Http\Requests\UpdateContractRequest;
 use App\Models\Booking;
 use App\Models\Contract;
+use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -287,47 +288,24 @@ class ContractController extends Controller
             ->with('success', 'Đã cập nhật hợp đồng thành công.');
     }
     /**
-     * Ký hợp đồng (Tenant, Admin & Landlord)
+     * Ký hợp đồng (Chỉ dành cho Tenant)
      */
     public function sign(Request $request, Contract $contract)
     {
         $this->authorize('sign', $contract);
 
-        // Log user and contract information
-        \Log::info('Contract confirmation attempt', [
-            'user_id' => auth()->id(),
-            'user_role' => auth()->user()->getRoleNames()->first() ?? 'no role',
-            'contract_id' => $contract->id
-        ]);
-
-        $contract->signed_at = now();
-        $contract->status = 'active';
-        $contract->save();
-
-        // Log successful signing
-        \Log::info('Contract confirmed successfully', [
-            'user_id' => auth()->id(),
-            'contract_id' => $contract->id,
-        ]);
-
-        // Update room status to rented if needed
-        if ($contract->room) {
-            $room = $contract->room;
-            // Nếu phòng đang trống, đánh dấu là đã có người thuê
-            if ($room->getRawOriginal('status') == 0) {
-                $room->status = 1; // 1 = Đã thuê
-                $room->save();
-            }
+        // Kiểm tra xem user hiện tại có phải là tenant của hợp đồng này không
+        if (auth()->id() !== $contract->tenant_id) {
+            return redirect()->back()->with('error', 'Bạn không có quyền xác nhận hợp đồng này.');
         }
 
-        // Determine the appropriate redirect route based on user role
-        if (auth()->user()->hasAnyRole(['admin', 'landlord'])) {
-            return redirect()->route('admin.contracts.show', $contract)
-                ->with('success', 'Hợp đồng đã được xác nhận thành công.');
-        } else {
+        // Sử dụng method mới từ model
+        if ($contract->confirmByTenant()) {
             return redirect()->route('tenant.contracts.show', $contract)
-                ->with('success', 'Hợp đồng đã được xác nhận thành công.');
+                ->with('success', 'Hợp đồng đã được xác nhận thành công. Hợp đồng bây giờ đã có hiệu lực.');
         }
+
+        return redirect()->back()->with('error', 'Không thể xác nhận hợp đồng này.');
     }
     /**
      * Chấm dứt hợp đồng (Admin & Landlord)
@@ -353,7 +331,7 @@ class ContractController extends Controller
 
         // Cập nhật trạng thái phòng thành trống
         $room = $contract->room;
-        $room->status = 0; // 0 = Còn trống
+        $room->status = Room::STATUS_AVAILABLE;
         $room->save();
 
         return redirect()->route('admin.contracts.index')

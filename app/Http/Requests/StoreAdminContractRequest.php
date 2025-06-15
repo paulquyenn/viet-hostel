@@ -31,7 +31,7 @@ class StoreAdminContractRequest extends FormRequest
             'monthly_rent' => ['required', 'numeric', 'min:0'],
             'deposit_amount' => ['required', 'numeric', 'min:0'],
             'terms_and_conditions' => ['required', 'string'],
-            'contract_file' => ['nullable', 'file|mimes:pdf,doc,docx|max:10240'],
+            'contract_file' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:10240'],
         ];
     }
 

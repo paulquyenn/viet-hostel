@@ -86,7 +86,7 @@
                                                 <td>
                                                     @if ($contract->status == 'pending')
                                                         <span class="badge bg-warning text-dark">
-                                                            {{ $contract->status_text }}
+                                                            Chờ người thuê xác nhận
                                                         </span>
                                                     @elseif($contract->status == 'active')
                                                         <span class="badge bg-success">
@@ -136,15 +136,11 @@
                                                         @endif
 
                                                         @if ($contract->status == 'active')
-                                                            <form method="POST"
-                                                                action="{{ route('admin.contracts.terminate', $contract->id) }}"
-                                                                class="d-inline">
-                                                                @csrf
-                                                                <button type="submit" class="btn btn-sm btn-danger"
-                                                                    onclick="return confirm('Bạn có chắc chắn muốn chấm dứt hợp đồng này?')">
-                                                                    <i class="bi bi-x-circle"></i> Chấm dứt
-                                                                </button>
-                                                            </form>
+                                                            <button type="button" class="btn btn-sm btn-danger"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#terminateModal{{ $contract->id }}">
+                                                                <i class="bi bi-x-circle"></i> Chấm dứt
+                                                            </button>
                                                         @endif
                                                     </div>
                                                 </td>
@@ -163,4 +159,45 @@
             </div>
         </div>
     </div>
+    </div>
+
+    <!-- Modal Chấm dứt hợp đồng cho từng hợp đồng -->
+    @foreach ($contracts as $contract)
+        @if ($contract->status == 'active')
+            <div class="modal fade" id="terminateModal{{ $contract->id }}" tabindex="-1"
+                aria-labelledby="terminateModalLabel{{ $contract->id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="terminateModalLabel{{ $contract->id }}">Chấm dứt hợp đồng
+                                #{{ $contract->contract_number }}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <form
+                            action="{{ Auth::user()->hasRole('admin') ? route('admin.contracts.terminate', $contract->id) : route('landlord.contracts.terminate', $contract->id) }}"
+                            method="POST">
+                            @csrf
+                            <div class="modal-body">
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    Bạn có chắc chắn muốn chấm dứt hợp đồng này? Hành động này không thể hoàn tác.
+                                </div>
+                                <div class="mb-3">
+                                    <label for="termination_reason{{ $contract->id }}" class="form-label">Lý do chấm
+                                        dứt <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="termination_reason{{ $contract->id }}" name="termination_reason" rows="4"
+                                        placeholder="Nhập lý do chấm dứt hợp đồng..." required></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-danger">Chấm dứt hợp đồng</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endforeach
 </x-admin-layout>

@@ -172,16 +172,36 @@
                                 @endif
                             </div>
                             <div>
-                                @if ($contract->status == 'pending' && !$contract->isSigned())
+                                @if ($contract->status == 'pending' && !$contract->isSigned() && auth()->id() === $contract->tenant_id)
                                     <button id="openSignModal"
                                         class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5"
                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                         Xác nhận hợp đồng
                                     </button>
+                                @elseif($contract->status == 'pending')
+                                    <span
+                                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Đang chờ xác nhận
+                                    </span>
+                                @elseif($contract->isSigned())
+                                    <span
+                                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-green-600 bg-green-100 rounded-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Đã xác nhận
+                                    </span>
                                 @endif
                             </div>
                         </div>
@@ -209,7 +229,8 @@
             </div>
             <div class="px-6 py-4">
                 <p class="mb-4 text-sm text-gray-600">
-                    Bằng việc xác nhận, bạn đồng ý với tất cả điều khoản và điều kiện của hợp đồng thuê phòng này.
+                    Bằng việc xác nhận, bạn đồng ý với tất cả điều khoản và điều kiện của hợp đồng thuê phòng này và xác
+                    nhận rằng bạn sẽ tuân thủ các điều khoản đã được thỏa thuận.
                 </p>
 
                 <form id="contract-sign-form" method="POST"

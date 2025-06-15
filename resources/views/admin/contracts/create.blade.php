@@ -68,6 +68,18 @@
                                                 <dt class="col-sm-4">Đặt cọc tiêu chuẩn</dt>
                                                 <dd class="col-sm-8">{{ number_format($booking->room->deposit) }} VND
                                                 </dd>
+
+                                                <dt class="col-sm-4">Sức chứa</dt>
+                                                <dd class="col-sm-8">
+                                                    {{ $booking->room->current_tenant_count }}/{{ $booking->room->max_person }}
+                                                    người
+                                                    @if ($booking->room->has_available_space)
+                                                        <span class="badge bg-success">Còn
+                                                            {{ $booking->room->available_spots }} chỗ</span>
+                                                    @else
+                                                        <span class="badge bg-warning">Đã đầy</span>
+                                                    @endif
+                                                </dd>
                                             </dl>
                                         </div>
                                     </div>

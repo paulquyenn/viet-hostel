@@ -90,7 +90,7 @@ class BookingController extends Controller
 
         // Kiểm tra xem phòng còn chỗ trống không
         $room = Room::find($booking->room_id);
-        if ($room->raw_status == 'occupied' && !$room->has_available_space) {
+        if (!$room->has_available_space) {
             return redirect()->back()->with('error', 'Phòng này đã đầy, không thể duyệt đơn đặt phòng.');
         }
 

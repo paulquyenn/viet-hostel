@@ -197,9 +197,9 @@
                         <div class="md:max-w-3xl">
                             <div class="flex items-center mb-3">
                                 <div
-                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $room->status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} mr-2">
+                                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $room->status === 'available' ? 'bg-green-100 text-green-800' : ($room->has_available_space ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }} mr-2">
                                     <span
-                                        class="w-2 h-2 rounded-full {{ $room->status === 'available' ? 'bg-green-500' : 'bg-red-500' }} mr-1"></span>
+                                        class="w-2 h-2 rounded-full {{ $room->status === 'available' ? 'bg-green-500' : ($room->has_available_space ? 'bg-yellow-500' : 'bg-red-500') }} mr-1"></span>
                                     {{ $room->status_text }}
                                 </div>
                                 @if ($room->created_at->diffInDays(now()) < 7)
@@ -337,8 +337,8 @@
                             </div>
                             <div class="text-sm font-medium text-gray-500">Trạng thái</div>
                             <div
-                                class="mt-1 text-xl font-bold {{ $room->status === 'available' ? 'text-green-600' : 'text-red-600' }}">
-                                {{ $room->status === 'available' ? 'Còn trống' : $room->status }}
+                                class="mt-1 text-xl font-bold {{ $room->status === 'available' ? 'text-green-600' : ($room->has_available_space ? 'text-yellow-600' : 'text-red-600') }}">
+                                {{ $room->status_text }}
                             </div>
                         </div>
                         <div

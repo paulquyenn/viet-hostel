@@ -55,18 +55,8 @@ class ContractPolicy
             return false;
         }
 
-        // Admin có quyền ký bất kỳ hợp đồng nào
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-
-        // Chủ trọ có thể ký hợp đồng của property họ sở hữu
-        if ($user->hasRole('landlord')) {
-            return $contract->room->building->user_id === $user->id;
-        }
-
-        // Người thuê có thể ký hợp đồng của họ
-        return $user->id === $contract->tenant_id;
+        // Chỉ có người thuê mới có quyền xác nhận hợp đồng
+        return $user->id === $contract->tenant_id && $contract->status === 'pending';
     }
 
     /**
