@@ -121,7 +121,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{contract}/download', [\App\Http\Controllers\Admin\ContractController::class, 'download'])->name('download');
             Route::get('/{contract}/edit', [\App\Http\Controllers\Admin\ContractController::class, 'edit'])->name('edit');
             Route::put('/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'update'])->name('update');
-            Route::post('/{contract}/sign', [\App\Http\Controllers\Admin\ContractController::class, 'sign'])->name('sign');
             Route::post('/{contract}/terminate', [\App\Http\Controllers\Admin\ContractController::class, 'terminate'])->name('terminate');
         });
 
@@ -169,7 +168,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{contract}/download', [\App\Http\Controllers\Admin\ContractController::class, 'download'])->name('download');
             Route::get('/{contract}/edit', [\App\Http\Controllers\Admin\ContractController::class, 'edit'])->name('edit');
             Route::put('/{contract}', [\App\Http\Controllers\Admin\ContractController::class, 'update'])->name('update');
-            Route::post('/{contract}/sign', [\App\Http\Controllers\Admin\ContractController::class, 'sign'])->name('sign');
             Route::post('/{contract}/terminate', [\App\Http\Controllers\Admin\ContractController::class, 'terminate'])->name('terminate');
         });
 

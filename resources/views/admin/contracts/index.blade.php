@@ -86,7 +86,7 @@
                                                 <td>
                                                     @if ($contract->status == 'pending')
                                                         <span class="badge bg-warning text-dark">
-                                                            {{ $contract->status_text }}
+                                                            Chờ người thuê xác nhận
                                                         </span>
                                                     @elseif($contract->status == 'active')
                                                         <span class="badge bg-success">

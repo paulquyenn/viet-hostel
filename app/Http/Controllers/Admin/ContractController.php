@@ -294,21 +294,6 @@ class ContractController extends Controller
     /**
      * Xác nhận hợp đồng
      */
-    public function sign(Request $request, Contract $contract)
-    {
-        // Chỉ cho phép xác nhận hợp đồng chưa ký
-        if ($contract->isSigned()) {
-            return redirect()->back()->with('error', 'Hợp đồng này đã được xác nhận.');
-        }
-
-        $contract->signed_at = now();
-        $contract->status = 'active';
-        $contract->save();
-
-        return redirect()->route('admin.contracts.show', $contract)
-            ->with('success', 'Đã xác nhận hợp đồng thành công.');
-    }
-
     /**
      * Chấm dứt hợp đồng
      */

@@ -226,20 +226,14 @@
                                         </svg>
                                         Chỉnh sửa
                                     </a>
-                                    <form method="POST" action="{{ route('admin.contracts.sign', $contract->id) }}"
-                                        class="d-inline">
-                                        @csrf
-                                        <button type="submit"
-                                            class="btn btn-success d-inline-flex align-items-center"
-                                            onclick="return confirm('Bạn có chắc chắn muốn xác nhận hợp đồng này?')">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                fill="currentColor" viewBox="0 0 16 16" class="me-2">
-                                                <path
-                                                    d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z" />
-                                            </svg>
-                                            Xác nhận hợp đồng
-                                        </button>
-                                    </form>
+                                    <div class="alert alert-info mb-0 d-inline-flex align-items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                                            <path
+                                                d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+                                        </svg>
+                                        <small>Hợp đồng đang chờ người thuê xác nhận</small>
+                                    </div>
                                 @elseif($contract->status == 'active')
                                     <form action="{{ route('admin.contracts.terminate', $contract->id) }}"
                                         method="POST" class="d-inline">
@@ -263,68 +257,4 @@
             </div>
         </div>
     </div>
-
-    <!-- Confirmation Modal -->
-    <div class="modal fade" id="signatureModal" tabindex="-1" aria-labelledby="signatureModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="signatureModalLabel">Xác nhận hợp đồng</h5>
-                    <button type="button" class="btn-close" id="closeSignModal" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-3 text-muted small">
-                        Bằng việc xác nhận, bạn với vai trò là chủ trọ chấp thuận hợp đồng này.
-                    </p>
-
-                    <form id="contract-sign-form" method="POST"
-                        action="{{ route('admin.contracts.sign', $contract->id) }}">
-                        @csrf
-                        <div class="d-flex justify-content-end">
-                            <button id="cancelSignModal" type="button" class="btn btn-outline-secondary me-2"
-                                data-bs-dismiss="modal">
-                                Hủy
-                            </button>
-                            <button type="submit" class="btn btn-success">
-                                Xác nhận hợp đồng
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Setup for signature modal
-            const modal = document.getElementById('signatureModal');
-            const openBtn = document.getElementById('openSignModal');
-            const closeBtn = document.getElementById('closeSignModal');
-            const cancelBtn = document.getElementById('cancelSignModal');
-
-            if (openBtn) {
-                openBtn.addEventListener('click', function() {
-                    const bsModal = new bootstrap.Modal(modal);
-                    bsModal.show();
-                });
-            }
-
-            if (closeBtn) {
-                closeBtn.addEventListener('click', function() {
-                    const bsModal = bootstrap.Modal.getInstance(modal);
-                    bsModal.hide();
-                });
-            }
-
-            if (cancelBtn) {
-                cancelBtn.addEventListener('click', function() {
-                    const bsModal = bootstrap.Modal.getInstance(modal);
-                    bsModal.hide();
-                });
-            }
-        });
-    </script>
 </x-admin-layout>
