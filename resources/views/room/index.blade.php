@@ -41,7 +41,7 @@
                                         <th>Giá thuê</th>
                                         <th>Tiền cọc</th>
                                         <th>Trạng thái</th>
-                                        <th>Người tối đa</th>
+                                        <th>Sức chứa (hiện tại/tối đa)</th>
                                         <th>Chức năng</th>
                                     </tr>
                                 </thead>
@@ -57,11 +57,19 @@
                                             <td>
                                                 @if ($room->status === 'available')
                                                     <span class="badge bg-success">{{ $room->status_text }}</span>
+                                                @elseif ($room->has_available_space)
+                                                    <span class="badge bg-warning">{{ $room->status_text }}</span>
                                                 @else
-                                                    <span class="badge bg-primary">{{ $room->status_text }}</span>
+                                                    <span class="badge bg-danger">{{ $room->status_text }}</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $room->max_person }}</td>
+                                            <td>
+                                                {{ $room->current_tenants_count }}/{{ $room->max_person }}
+                                                @if ($room->has_available_space)
+                                                    <small class="text-success">(còn
+                                                        {{ $room->available_spots }})</small>
+                                                @endif
+                                            </td>
                                             <td>
                                                 <a href="{{ route((auth()->user()->hasRole('admin') ? 'admin' : 'landlord') . '.rooms.show', $room) }}"
                                                     class="btn btn-sm btn-info">

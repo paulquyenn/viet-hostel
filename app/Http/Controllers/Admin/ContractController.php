@@ -68,15 +68,23 @@ class ContractController extends Controller
         $room = $booking->room;
         $tenant = $booking->user;
 
-        // Lấy danh sách phòng trống dựa trên role
+        // Lấy danh sách phòng có chỗ trống dựa trên role
         if ($user->hasRole('admin')) {
-            $rooms = Room::where('status', 'available')->with('building')->get();
+            $rooms = Room::whereRaw("status = 'available' OR (status = 'occupied' AND max_person > (
+                SELECT COUNT(*) FROM contracts
+                WHERE contracts.room_id = rooms.id
+                AND contracts.status IN ('active', 'approved')
+            ))")->with('building')->get();
         } else {
             // Landlord chỉ xem phòng của mình
-            $rooms = Room::where('status', 'available')
-                ->whereHas('building', function ($query) use ($user) {
+            $rooms = Room::whereHas('building', function ($query) use ($user) {
                     $query->where('user_id', $user->id);
                 })
+                ->whereRaw("status = 'available' OR (status = 'occupied' AND max_person > (
+                    SELECT COUNT(*) FROM contracts
+                    WHERE contracts.room_id = rooms.id
+                    AND contracts.status IN ('active', 'approved')
+                ))")
                 ->with('building')
                 ->get();
         }
@@ -115,9 +123,9 @@ class ContractController extends Controller
             abort(403, 'Bạn không có quyền tạo hợp đồng cho phòng này.');
         }
 
-        // Kiểm tra xem phòng có trạng thái "available" không
-        if ($room->status !== 'available') {
-            return redirect()->back()->with('error', 'Phòng này đã có người thuê.');
+        // Kiểm tra xem phòng có còn chỗ trống không
+        if (!$room->has_available_space) {
+            return redirect()->back()->with('error', 'Phòng này đã đầy, không thể tạo thêm hợp đồng.');
         }
 
         // Tạo mã hợp đồng
@@ -146,10 +154,12 @@ class ContractController extends Controller
         $contract->file_path = $filePath;
         $contract->save();
 
-        // Cập nhật trạng thái phòng thành "occupied"
+        // Cập nhật trạng thái phòng thành "occupied" nếu có người thuê
         $room = Room::find($validated['room_id']);
-        $room->status = 'occupied';
-        $room->save();
+        if ($room->status === 'available') {
+            $room->status = 'occupied';
+            $room->save();
+        }
 
         // Cập nhật booking nếu có
         if ($validated['booking_id']) {
@@ -187,10 +197,16 @@ class ContractController extends Controller
 
         $contract->load(['booking', 'room.building', 'tenant', 'landlord']);
 
-        // Lấy danh sách phòng trống và phòng hiện tại
+        // Lấy danh sách phòng có chỗ trống và phòng hiện tại
         $rooms = Room::where(function ($query) use ($contract) {
-            $query->where('status', 'available') // Phòng trống
-                ->orWhere('id', $contract->room_id); // Hoặc phòng hiện tại
+            // Phòng có chỗ trống
+            $query->whereRaw("status = 'available' OR (status = 'occupied' AND max_person > (
+                SELECT COUNT(*) FROM contracts
+                WHERE contracts.room_id = rooms.id
+                AND contracts.status IN ('active', 'approved')
+            ))")
+            // Hoặc phòng hiện tại (luôn cho phép)
+            ->orWhere('id', $contract->room_id);
         })->with('building')->get();
 
         // Lấy danh sách người thuê và chủ trọ
@@ -227,21 +243,25 @@ class ContractController extends Controller
         // Lấy dữ liệu đã validate
         $validated = $request->validated();
 
-        // Nếu thay đổi phòng, cần kiểm tra trạng thái phòng mới
+        // Nếu thay đổi phòng, cần kiểm tra phòng mới có còn chỗ trống không
         if ($validated['room_id'] != $contract->room_id) {
             $room = Room::find($validated['room_id']);
-            if ($room->status !== 'available') {
-                return redirect()->back()->with('error', 'Phòng này đã có người thuê.');
+            if (!$room->has_available_space) {
+                return redirect()->back()->with('error', 'Phòng này đã đầy, không thể chuyển vào.');
             }
 
-            // Cập nhật trạng thái phòng cũ thành "available"
+            // Cập nhật trạng thái phòng cũ nếu không còn ai thuê
             $oldRoom = Room::find($contract->room_id);
-            $oldRoom->status = 'available';
-            $oldRoom->save();
+            if ($oldRoom->current_tenant_count <= 1) {
+                $oldRoom->status = 'available';
+                $oldRoom->save();
+            }
 
-            // Cập nhật trạng thái phòng mới thành "occupied"
-            $room->status = 'occupied';
-            $room->save();
+            // Cập nhật trạng thái phòng mới thành "occupied" nếu chưa phải
+            if ($room->status === 'available') {
+                $room->status = 'occupied';
+                $room->save();
+            }
         }
 
         // Lưu file hợp đồng mới nếu có

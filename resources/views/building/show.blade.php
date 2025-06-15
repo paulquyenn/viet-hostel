@@ -167,12 +167,21 @@
                                                             <strong>{{ number_format($room->price, 0) }} VND</strong>
                                                         </td>
                                                         <td>{{ number_format($room->deposit, 0) }} VND</td>
-                                                        <td>{{ $room->max_person }} người</td>
+                                                        <td>
+                                                            {{ $room->current_tenants_count }}/{{ $room->max_person }}
+                                                            người
+                                                            @if ($room->has_available_space)
+                                                                <small class="text-success">(còn
+                                                                    {{ $room->available_spots }} chỗ)</small>
+                                                            @endif
+                                                        </td>
                                                         <td>
                                                             @if ($room->status === 'available')
                                                                 <span class="badge bg-success">Trống</span>
+                                                            @elseif ($room->has_available_space)
+                                                                <span class="badge bg-warning">Còn chỗ</span>
                                                             @else
-                                                                <span class="badge bg-warning">Đã thuê</span>
+                                                                <span class="badge bg-danger">Đầy</span>
                                                             @endif
                                                         </td>
                                                         <td>

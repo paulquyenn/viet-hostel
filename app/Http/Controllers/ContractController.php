@@ -314,8 +314,8 @@ class ContractController extends Controller
         if ($contract->room) {
             $room = $contract->room;
             // Nếu phòng đang trống, đánh dấu là đã có người thuê
-            if ($room->getRawOriginal('status') == 0) {
-                $room->status = 1; // 1 = Đã thuê
+            if ($room->status === 'available') {
+                $room->status = 'occupied';
                 $room->save();
             }
         }
