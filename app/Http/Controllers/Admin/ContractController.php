@@ -102,7 +102,8 @@ class ContractController extends Controller
 
         // Chuẩn bị giá trị mặc định cho ngày bắt đầu và kết thúc hợp đồng
         $startDate = $booking->desired_move_date ? $booking->desired_move_date->format('Y-m-d') : now()->format('Y-m-d');
-        $endDate = $booking->duration ? now()->addMonths($booking->duration)->format('Y-m-d') : now()->addYear()->format('Y-m-d');
+
+        $endDate = $booking->duration ? $booking->desired_move_date->addMonths($booking->duration)->format('Y-m-d') : now()->addYear()->format('Y-m-d');
 
         return view('admin.contracts.create', compact('booking', 'room', 'tenant', 'rooms', 'tenants', 'landlords', 'startDate', 'endDate'));
     }
