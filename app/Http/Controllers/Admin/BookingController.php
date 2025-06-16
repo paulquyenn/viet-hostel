@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RejectBookingRequest;
 use App\Models\Booking;
 use App\Models\Contract;
 use App\Models\Room;
@@ -105,7 +104,7 @@ class BookingController extends Controller
     /**
      * Từ chối yêu cầu đặt phòng
      */
-    public function reject(RejectBookingRequest $request, Booking $booking)
+    public function reject(Request $request, Booking $booking)
     {
         $user = Auth::user();
 
@@ -125,10 +124,17 @@ class BookingController extends Controller
             return redirect()->back()->with('error', 'Chỉ có thể từ chối yêu cầu đang chờ xử lý.');
         }
 
-        $validated = $request->validated();
+        // Validate reject_reason
+        $request->validate([
+            'reject_reason' => 'required|string|max:500',
+        ], [
+            'reject_reason.required' => 'Lý do từ chối là bắt buộc.',
+            'reject_reason.string' => 'Lý do từ chối phải là chuỗi ký tự.',
+            'reject_reason.max' => 'Lý do từ chối không được vượt quá 500 ký tự.',
+        ]);
 
         $booking->status = 'rejected';
-        $booking->note = $booking->note . "\n\nLý do từ chối: " . $validated['reject_reason'];
+        $booking->note = $booking->note . "\n\nLý do từ chối: " . $request->reject_reason;
         $booking->save();
 
         return redirect()->route('admin.bookings.index')

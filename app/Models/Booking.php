@@ -15,7 +15,8 @@ class Booking extends Model
         'desired_move_date',
         'duration',
         'note',
-        'status'
+        'status',
+        'reject_reason'
     ];
 
     protected $casts = [

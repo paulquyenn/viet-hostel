@@ -94,15 +94,49 @@
                                                             </button>
                                                         </form>
 
-                                                        <form method="POST"
-                                                            action="{{ route('admin.bookings.reject', $booking->id) }}"
-                                                            class="d-inline">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-sm btn-danger"
-                                                                onclick="return confirm('Bạn có chắc chắn muốn từ chối đơn đặt phòng này?')">
-                                                                <i class="bi bi-x-lg"></i> Từ chối
-                                                            </button>
-                                                        </form>
+                                                        <button type="button" class="btn btn-sm btn-danger"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#rejectModal{{ $booking->id }}">
+                                                            <i class="bi bi-x-lg"></i> Từ chối
+                                                        </button>
+
+                                                        <!-- Reject Modal -->
+                                                        <div class="modal fade" id="rejectModal{{ $booking->id }}"
+                                                            tabindex="-1">
+                                                            <div class="modal-dialog">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">Từ chối đơn đặt phòng
+                                                                        </h5>
+                                                                        <button type="button" class="btn-close"
+                                                                            data-bs-dismiss="modal"></button>
+                                                                    </div>
+                                                                    <form method="POST"
+                                                                        action="{{ route('admin.bookings.reject', $booking->id) }}">
+                                                                        @csrf
+                                                                        <div class="modal-body">
+                                                                            <div class="mb-3">
+                                                                                <label
+                                                                                    for="reject_reason{{ $booking->id }}"
+                                                                                    class="form-label">Lý do từ chối
+                                                                                    <span
+                                                                                        class="text-danger">*</span></label>
+                                                                                <textarea class="form-control" id="reject_reason{{ $booking->id }}" name="reject_reason" rows="4"
+                                                                                    placeholder="Nhập lý do từ chối đơn đặt phòng..." required></textarea>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button"
+                                                                                class="btn btn-secondary"
+                                                                                data-bs-dismiss="modal">Hủy</button>
+                                                                            <button type="submit"
+                                                                                class="btn btn-danger">Từ chối
+                                                                                đơn</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     @elseif($booking->status == 'approved' && !$booking->contract)
                                                         <a href="{{ route('admin.contracts.create', $booking->id) }}"
                                                             class="btn btn-sm btn-success">
