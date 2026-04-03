@@ -1,0 +1,43 @@
+services:
+  app:
+    image: paulquyenn/viet-hostel:latest
+    container_name: viet-hostel-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:80"
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_DATABASE: viet_hostel
+      DB_USERNAME: viet_hostel
+      DB_PASSWORD: 12345678
+    volumes:
+      - app-storage:/var/www/html/storage/app
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.0
+    container_name: viet-hostel-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: viet_hostel
+      MYSQL_USER: viet_hostel
+      MYSQL_PASSWORD: 12345678
+    ports:
+      - "${DB_PORT:-3307}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  mysql-data:
+  app-storage:

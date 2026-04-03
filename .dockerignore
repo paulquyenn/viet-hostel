@@ -1,0 +1,33 @@
+# Directories
+.git
+.github
+.idea
+.vscode
+.fleet
+.nova
+.zed
+node_modules
+vendor
+tests
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+storage/pail
+
+# Files
+.env
+.env.backup
+.env.production
+.editorconfig
+.gitattributes
+.gitignore
+.phpunit.result.cache
+.phpactor.json
+docker-compose.yml
+Dockerfile
+phpunit.xml
+README.md
+bun.lock
+
+# Docker (keep docker/ directory accessible for build)
